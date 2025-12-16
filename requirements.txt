@@ -1,7 +1,0 @@
-langgraph
-langchain
-typing_extensions
-radon
-ollama
-black
-ruff
