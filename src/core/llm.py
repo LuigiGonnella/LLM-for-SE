@@ -24,7 +24,6 @@ You always act as one agent with one identity.
 CONFIG = ModelConfig()
 
 
-
 def call_llm(
     *,
     user_prompt: str,
