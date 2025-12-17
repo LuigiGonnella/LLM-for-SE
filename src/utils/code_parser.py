@@ -28,7 +28,7 @@ def extract_python_code(llm_output: str) -> str:
     code_start = re.search(r"^(def |class )", llm_output, re.MULTILINE)
     if code_start:
         # Return everything from the first def/class onwards
-        return llm_output[code_start.start():].strip()
+        return llm_output[code_start.start() :].strip()
 
     # Fallback: return as-is (might already be clean code)
     return llm_output.strip()
