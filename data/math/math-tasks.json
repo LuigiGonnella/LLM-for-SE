@@ -1,129 +1,63 @@
 [
   {
     "id": "prime_fib",
-    "signature": "def prime_fib(n: int):",
+    "signature": "def prime_fib(n: int) -> int:",
     "docstring": "prime_fib returns n-th number that is a Fibonacci number and it's also prime.",
     "examples": [
-      {
-        "input": "1",
-        "output": "2"
-      },
-      {
-        "input": "2",
-        "output": "3"
-      },
-      {
-        "input": "3",
-        "output": "5"
-      },
-      {
-        "input": "4",
-        "output": "13"
-      },
-      {
-        "input": "5",
-        "output": "89"
-      }
+      { "input": "1", "output": "2" },
+      { "input": "2", "output": "3" },
+      { "input": "3", "output": "5" },
+      { "input": "4", "output": "13" },
+      { "input": "5", "output": "89" }
     ],
     "difficulty": "Hard"
   },
   {
     "id": "modp",
-    "signature": "def modp(n: int, p: int):",
+    "signature": "def modp(n: int, p: int) -> int:",
     "docstring": "Return 2^n modulo p (be aware of numerics).",
     "examples": [
-      {
-        "input": "3, 5",
-        "output": "3"
-      },
-      {
-        "input": "1101, 101",
-        "output": "2"
-      },
-      {
-        "input": "0, 101",
-        "output": "1"
-      },
-      {
-        "input": "3, 11",
-        "output": "8"
-      },
-      {
-        "input": "100, 101",
-        "output": "1"
-      }
+      { "input": "3, 5", "output": "3" },
+      { "input": "1101, 101", "output": "2" },
+      { "input": "0, 101", "output": "1" },
+      { "input": "3, 11", "output": "8" },
+      { "input": "100, 101", "output": "1" }
     ],
     "difficulty": "Medium"
   },
   {
     "id": "largest_prime_factor",
-    "signature": "def largest_prime_factor(n: int):",
+    "signature": "def largest_prime_factor(n: int) -> int:",
     "docstring": "Return the largest prime factor of n. Assume n > 1 and is not a prime.",
     "examples": [
-      {
-        "input": "13195",
-        "output": "29"
-      },
-      {
-        "input": "2048",
-        "output": "2"
-      }
+      { "input": "13195", "output": "29" },
+      { "input": "2048", "output": "2" }
     ],
     "difficulty": "Hard"
   },
   {
     "id": "is_simple_power",
-    "signature": "def is_simple_power(x, n):",
+    "signature": "def is_simple_power(x: int, n: int) -> bool:",
     "docstring": "Your task is to write a function that returns true if a number x is a simple\n    power of n and false in other cases.\n    x is a simple power of n if n**int=x",
     "examples": [
-      {
-        "input": "1, 4", 
-        "output": true
-      },
-      {
-        "input": "2, 2",
-        "output": true
-      },
-      {
-        "input": "8, 2",
-        "output": true
-      },
-      {
-        "input": "3, 2",
-        "output": false
-      },
-      {
-        "input": "3, 1",
-        "output": false
-      },
-      {
-        "input": "5, 3",
-        "output": false
-      }
+      { "input": "1, 4", "output": true },
+      { "input": "2, 2", "output": true },
+      { "input": "8, 2", "output": true },
+      { "input": "3, 2", "output": false },
+      { "input": "3, 1", "output": false },
+      { "input": "5, 3", "output": false }
     ],
     "difficulty": "Medium"
   },
   {
     "id": "any_int",
-    "signature": "def any_int(x, y, z):",
+    "signature": "def any_int(x: float, y: float, z: float) -> bool:",
     "docstring": "Create a function that takes 3 numbers.\n    Returns true if one of the numbers is equal to the sum of the other two, and all numbers are integers.\n    Returns false in any other cases.",
     "examples": [
-        {
-          "input": "5, 2, 7", 
-          "output": true
-        },
-        {
-          "input": "3, 2, 2", 
-          "output": false
-        },
-        {
-          "input": "3, -2, 1", 
-          "output": true
-        },
-        {
-          "input": "3.6, -2.2, 2", 
-          "output": false
-        }
+      { "input": "5, 2, 7", "output": true },
+      { "input": "3, 2, 2", "output": false },
+      { "input": "3, -2, 1", "output": true },
+      { "input": "3.6, -2.2, 2", "output": false }
     ],
     "difficulty": "Easy"
   }
