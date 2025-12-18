@@ -25,12 +25,14 @@ def main():
             "task_id": task["id"],
             "signature": task["signature"],
             "docstring": task["docstring"],
+            "examples": task.get("examples"),
+            "difficulty": task.get("difficulty"),
+            "model": config.model_name,
             "analysis": None,
             "plan": None,
             "code": None,
             "review": None,
             "exec_result": None,
-            "model": config.model_name,
         }
 
         final_state = graph.invoke(state)

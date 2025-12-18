@@ -27,6 +27,7 @@ def load_tasks(path: str) -> List[Dict]:
         raise ValueError("Task file must contain a list of tasks")
 
     required_fields = {"id", "signature", "docstring"}
+    optional_fields = {"examples", "difficulty"}
 
     for task in tasks:
         if not required_fields.issubset(task.keys()):
@@ -34,5 +35,8 @@ def load_tasks(path: str) -> List[Dict]:
                 f"Task {task.get('id', '<unknown>')} is missing required fields. "
                 f"Expected fields: {required_fields}"
             )
+
+        for field in optional_fields:
+            task.setdefault(field, None)
 
     return tasks

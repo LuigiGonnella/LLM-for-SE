@@ -14,6 +14,7 @@ def analysis_node(state: AgentState) -> AgentState:
     state["analysis"] = analyze_task(
         signature=state["signature"],
         docstring=state["docstring"],
+        examples=state.get("examples"),
         model=state["model"],
     )
     return state

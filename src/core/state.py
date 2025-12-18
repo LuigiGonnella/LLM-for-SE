@@ -6,6 +6,8 @@ class AgentState(TypedDict):
     task_id: str
     signature: str
     docstring: str
+    examples: Optional[str]
+    difficulty: Optional[str]
     model: str
     analysis: Optional[str]
     plan: Optional[str]

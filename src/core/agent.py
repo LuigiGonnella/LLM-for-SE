@@ -8,7 +8,7 @@ Each function corresponds to ONE node in the LangGraph pipeline.
 from src.core.llm import call_llm
 
 
-def analyze_task(*, signature: str, docstring: str, model: str) -> str:
+def analyze_task(*, signature: str, docstring: str, examples: str = None, model: str) -> str:
     prompt = (
         "Analyze the following programming task.\n\n"
         "- Extract required behavior\n"
@@ -18,6 +18,8 @@ def analyze_task(*, signature: str, docstring: str, model: str) -> str:
         f"Function signature:\n{signature}\n\n"
         f"Docstring:\n{docstring}"
     )
+    if examples:
+        prompt += f"\n\nExamples:\n{examples}"
     return call_llm(user_prompt=prompt, model=model)
 
 

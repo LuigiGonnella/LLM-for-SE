@@ -23,6 +23,8 @@ def test_agent_state_structure():
         "task_id": "test",
         "signature": "def foo():",
         "docstring": "Test function",
+        "examples": None,
+        "difficulty": None,
         "model": "test-model",
         "analysis": None,
         "plan": None,
@@ -35,6 +37,8 @@ def test_agent_state_structure():
     assert "task_id" in state
     assert "signature" in state
     assert "docstring" in state
+    assert "examples" in state
+    assert "difficulty" in state
     assert "model" in state
     assert "analysis" in state
     assert "plan" in state
@@ -49,6 +53,8 @@ def test_agent_state_optional_fields():
         "task_id": "test",
         "signature": "def foo():",
         "docstring": "Test function",
+        "examples": None,
+        "difficulty": None,
         "model": "test-model",
         "analysis": None,
         "plan": None,
@@ -62,3 +68,5 @@ def test_agent_state_optional_fields():
     assert state["code"] is None
     assert state["review"] is None
     assert state["exec_result"] is None
+    assert state["examples"] is None
+    assert state["difficulty"] is None
