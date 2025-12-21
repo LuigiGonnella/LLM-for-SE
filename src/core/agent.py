@@ -8,7 +8,7 @@ Each function corresponds to ONE node in the LangGraph pipeline.
 from src.core.llm import call_llm
 
 
-def analyze_task(*, signature: str, docstring: str, examples: str = None, difficulty: str = None, model: str) -> str:
+def analyze_task(*, signature: str, docstring: str, examples: str = None, model: str) -> str:
     prompt = (
        "You are an expert software engineer and task analyzer.\n"
         "Your job is to deeply analyze the programming task described below.\n\n"
@@ -49,8 +49,6 @@ def analyze_task(*, signature: str, docstring: str, examples: str = None, diffic
     )
     if examples:
         prompt += f"\n\nExamples:\n{examples}"
-    if difficulty:
-        prompt += f"\n\nDifficulty: {difficulty}"
 
     prompt += (
         "\n\nREMEMBER:\n"
@@ -62,7 +60,7 @@ def analyze_task(*, signature: str, docstring: str, examples: str = None, diffic
     return call_llm(user_prompt=prompt, model=model)
 
 
-def plan_solution(*, analysis: str, difficulty: str = None, model: str) -> str:
+def plan_solution(*, analysis: str, model: str) -> str:
     prompt = (
         "You are an expert software engineer responsible for planning a correct and robust solution.\n"
         "You are given a completed task analysis.\n\n"
@@ -98,8 +96,7 @@ def plan_solution(*, analysis: str, difficulty: str = None, model: str) -> str:
         "INPUT ANALYSIS:\n\n"
         f"{analysis}"
     )
-    if difficulty:
-        prompt += f"\n\nDifficulty: {difficulty}"
+
     
     prompt += (
         "\n\nREMEMBER:\n"
@@ -144,36 +141,55 @@ def generate_code(*, signature: str, plan: str, model: str) -> str:
     return call_llm(user_prompt=prompt, model=model)
 
 
-def review_code(*, code: str, model: str) -> str:
+def review_code(*, code: str, model: str, exec_result: dict) -> str:
     prompt = (
-         "You are a strict and detail-oriented code reviewer.\n"
-        "Your task is to verify the correctness and compliance of the given Python code.\n\n"
+        "You are a strict and detail-oriented code reviewer and judge.\n"
+        "You must evaluate the given Python code using BOTH static analysis and execution results.\n\n"
 
-        "REVIEW RULES:\n"
+        "ABSOLUTE RULES:\n"
         "- Do NOT rewrite or fix the code\n"
         "- Do NOT suggest alternative implementations unless necessary to explain an issue\n"
-        "- Base your review ONLY on the provided code\n\n"
+        "- Base your review ONLY on the provided code and execution results\n"
+        "- Treat execution failures as definitive evidence of incorrectness\n\n"
+
+        "EXECUTION RESULT SCHEMA (AUTHORITATIVE):\n"
+        "- success: whether the code executed without raising exceptions\n"
+        "- error: exception information if execution failed\n"
+        "- output: captured stdout/stderr (must normally be empty)\n"
+        "- function_extracted: whether at least one callable function was defined\n"
+        "- function_names: list of extracted function names\n\n"
+
+        "EXECUTION INTERPRETATION RULES:\n"
+        "- If success is False, the code HAS issues\n"
+        "- If error is not None, the code HAS issues\n"
+        "- If function_extracted is False, the code HAS issues\n"
+        "- If more than one function is defined, the code HAS issues\n"
+        "- If output is non-empty, treat it as a potential violation (unexpected I/O)\n\n"
 
         "REVIEW OBJECTIVES:\n"
-        "1. Verify logical correctness\n"
-        "2. Identify missing or incorrect edge case handling\n"
-        "3. Detect violations of the function signature or stated contract\n"
-        "4. Identify incorrect assumptions or undefined behavior\n"
-        "5. Detect side effects or forbidden operations (I/O, globals, mutation if not allowed)\n\n"
+        "1. Verify execution success and function extraction\n"
+        "2. Verify logical correctness via static inspection\n"
+        "3. Identify missing or incorrect edge case handling\n"
+        "4. Detect violations of the function contract or signature expectations\n"
+        "5. Detect forbidden behavior (I/O, globals, side effects)\n\n"
 
         "OUTPUT FORMAT (MANDATORY):\n"
         "Return your review using the following sections:\n\n"
+        "### Execution Results Analysis\n"
+        "- State whether execution succeeded\n"
+        "- State whether exactly one function was extracted\n"
+        "- Report any execution error or unexpected output\n\n"
         "### Signature and Contract Compliance\n"
-        "- State whether the function signature is correct and unchanged\n"
-        "- Identify any mismatch in parameters, return type, or behavior\n\n"
+        "- State whether the function definition appears valid and compliant\n"
+        "- Identify any mismatch in name, parameters, or behavior\n\n"
         "### Logical Correctness\n"
-        "- Describe any logical errors or incorrect conditions\n"
+        "- Describe any logical errors based on code inspection\n"
         "- If none are found, explicitly state: \"No logical errors found\"\n\n"
         "### Edge Case Coverage\n"
-        "- List missing or incorrectly handled edge cases\n"
+        "- Identify missing or incorrectly handled edge cases\n"
         "- If none are missing, explicitly state: \"All relevant edge cases appear to be handled\"\n\n"
         "### Constraint Violations\n"
-        "- Identify any violations of constraints (performance, mutation, recursion, etc.)\n"
+        "- Identify violations such as unexpected I/O, multiple functions, globals, or side effects\n"
         "- If none are found, explicitly state: \"No constraint violations detected\"\n\n"
         "### Final Verdict\n"
         "- One of the following EXACT statements:\n"
@@ -183,8 +199,13 @@ def review_code(*, code: str, model: str) -> str:
         "CODE UNDER REVIEW:\n\n"
         f"{code}\n\n"
 
+        "EXECUTION RESULTS:\n\n"
+        f"{exec_result}\n\n"
+
         "IMPORTANT:\n"
-        "- If the code appears fully correct, you MUST say so explicitly\n"
+        "- If execution failed or function_extracted is False, the final verdict MUST be \"Code has issues\"\n"
+        "- If more than one function name is present, the final verdict MUST be \"Code has issues\"\n"
+        "- If unexpected output is produced, explicitly mention it\n"
         "- Do NOT be vague or speculative\n"
         "- Do NOT include code blocks or markdown\n"
     )
