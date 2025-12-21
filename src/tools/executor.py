@@ -37,7 +37,5 @@ def execute_code(code: str) -> dict:
             result["function_names"] = []
     except Exception as e:
         result["error"] = f"{type(e).__name__}: {str(e)}"
-    except SyntaxError as se:
-        result["error"] = f"Syntax Error: {str(se)}"
 
     return result

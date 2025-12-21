@@ -53,7 +53,8 @@ def review_node(state: AgentState) -> AgentState:
         exec_result=exec_result,
     )
 
-    print(f"Review results: {exec_result}")
+    print(f"Exec results: {exec_result}")
+    print(f'Reviewer result: {state["review"].split('\n')[-1]}')
     return state
 
 
@@ -63,26 +64,45 @@ def refinement_node(state: AgentState) -> AgentState:
     max_refinements = 3
     refinement_count = state.get("refinement_count", 0)
 
+    # EARLY EXIT if code is already correct
+    if "review" in state and "Code is correct" in state["review"]:
+        print("Code already correct. Skipping refinement.")
+        return state
+
     if refinement_count >= max_refinements:
         print("Maximum refinements reached. Ending refinement.")
         return state
-    
+
     raw_code = refine_code(
         code=state["code"],
         review=state["review"],
         model=state["model"],
     )
-    refined_code = extract_python_code(raw_code)
-    refined_result = execute_code(refined_code)
 
+    # Refiner MUST output pure Python
+    refined_code = extract_python_code(raw_code)
+
+    exec_result = execute_code(refined_code)
+
+    # Always update state
     state["code"] = refined_code
-    state["exec_result"] = refined_result
+    state["exec_result"] = exec_result
     state["refinement_count"] = refinement_count + 1
 
-    if refined_result["success"]:
-        print("Refinement successful.")
+    # Re-run reviewer after refinement
+    review = review_code(
+        code=refined_code,
+        exec_result=exec_result,
+        model=state["model"],
+    )
+    state["review"] = review
+
+    # Decide outcome based on reviewer verdict, not exec alone
+    if "Code is correct" in review:
+        print("Refinement successful: code is correct.")
     else:
-        print("Refinement did not lead to successful execution.")
+        print("Refinement incomplete: issues remain.")
+
     return state
 
 
