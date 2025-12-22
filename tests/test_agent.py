@@ -111,7 +111,7 @@ def test_refine_code(mock_llm):
     prompt = call_args.kwargs["user_prompt"]
     assert original_code in prompt
     assert review in prompt
-    assert "Fix ONLY the issues" in prompt
+    assert "Fix correctness issues" in prompt
 
 
 def test_all_functions_use_keyword_only_args():
