@@ -33,7 +33,7 @@ def test_analyze_task(mock_llm):
     # Check that the prompt contains key elements
     call_args = mock_llm.call_args
     prompt = call_args.kwargs["user_prompt"]
-    assert "Analyze the following programming task" in prompt
+    assert "deeply analyze the programming task" in prompt
     assert "def foo(x: int) -> int:" in prompt
     assert "Return x + 1" in prompt
     assert call_args.kwargs["model"] == "test-model"
@@ -50,7 +50,7 @@ def test_plan_solution(mock_llm):
 
     call_args = mock_llm.call_args
     prompt = call_args.kwargs["user_prompt"]
-    assert "step-by-step plan" in prompt
+    assert "Step-by-Step Plan" in prompt
     assert "Task requires incrementing x" in prompt
 
 
@@ -67,7 +67,7 @@ def test_generate_code(mock_llm):
 
     call_args = mock_llm.call_args
     prompt = call_args.kwargs["user_prompt"]
-    assert "generate the Python function" in prompt
+    assert "Generate a complete and correct Python function" in prompt
     assert "def foo(x: int) -> int:" in prompt
     assert "1. Return x + 1" in prompt
 
@@ -77,14 +77,21 @@ def test_review_code(mock_llm):
     mock_llm.return_value = "The code looks correct"
 
     code = "def foo(x: int) -> int:\n    return x + 1"
-    result = review_code(code=code, model="test-model")
+    exec_result = {
+        "success": True,
+        "error": None,
+        "output": "",
+        "function_extracted": True,
+        "function_names": ["foo"],
+    }
+    result = review_code(code=code, model="test-model", exec_result=exec_result)
 
     assert result == "The code looks correct"
     mock_llm.assert_called_once()
 
     call_args = mock_llm.call_args
     prompt = call_args.kwargs["user_prompt"]
-    assert "Review the Python code" in prompt
+    assert "evaluate the given Python code" in prompt
     assert code in prompt
 
 
@@ -104,7 +111,7 @@ def test_refine_code(mock_llm):
     prompt = call_args.kwargs["user_prompt"]
     assert original_code in prompt
     assert review in prompt
-    assert "fix the code" in prompt
+    assert "Fix ONLY the issues" in prompt
 
 
 def test_all_functions_use_keyword_only_args():
@@ -120,7 +127,7 @@ def test_all_functions_use_keyword_only_args():
         generate_code("sig", "plan", "model")
 
     with pytest.raises(TypeError):
-        review_code("code", "model")
+        review_code("code", "model", {})
 
     with pytest.raises(TypeError):
         refine_code("code", "review", "model")
