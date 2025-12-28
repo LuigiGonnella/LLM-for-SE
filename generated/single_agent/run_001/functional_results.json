@@ -1,0 +1,47 @@
+[
+  {
+    "task_id": "prime_fib",
+    "functional": {
+      "passed": true,
+      "tests_run": 12,
+      "failures": 0,
+      "errors": 0
+    }
+  },
+  {
+    "task_id": "modp",
+    "functional": {
+      "passed": true,
+      "tests_run": 9,
+      "failures": 0,
+      "errors": 0
+    }
+  },
+  {
+    "task_id": "largest_prime_factor",
+    "functional": {
+      "passed": true,
+      "tests_run": 7,
+      "failures": 0,
+      "errors": 0
+    }
+  },
+  {
+    "task_id": "is_simple_power",
+    "functional": {
+      "passed": true,
+      "tests_run": 12,
+      "failures": 0,
+      "errors": 0
+    }
+  },
+  {
+    "task_id": "any_int",
+    "functional": {
+      "passed": true,
+      "tests_run": 11,
+      "failures": 0,
+      "errors": 0
+    }
+  }
+]
