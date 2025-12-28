@@ -2,17 +2,16 @@ import argparse
 import os
 import sys
 
-from src.core.pipeline import build_single_agent_graph
-from src.utils.task_loader import load_tasks
-from src.utils.config import config
-from src.evaluation.quality import format_metrics_report
-
 # Ensure project root is on sys.path so `src` package is importable when
 # running this script directly (e.g. `python scripts/run_single_agent.py`).
 _PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 if _PROJECT_ROOT not in sys.path:
     sys.path.insert(0, _PROJECT_ROOT)
 
+from src.core.pipeline import build_single_agent_graph
+from src.utils.task_loader import load_tasks
+from src.utils.config import config
+from src.evaluation.quality import format_metrics_report
 
 def main():
     parser = argparse.ArgumentParser(
@@ -24,7 +23,20 @@ def main():
         default="data/test-tasks.json",
         help="Path to task file (e.g., data/logic/logic-tasks.json)",
     )
+    parser.add_argument(
+    "--run_id",
+    default="run_001",
+    help="Run identifier (e.g. run_001, run_002)"
+    )
     args = parser.parse_args()
+
+    # --- Define output directory ---
+    output_dir = os.path.join(
+        "generated",
+        "single_agent",
+        args.run_id,
+    )
+    os.makedirs(output_dir, exist_ok=True)
 
     graph = build_single_agent_graph()
     tasks = load_tasks(args.task_file)
@@ -60,19 +72,29 @@ def main():
 
         final_state = graph.invoke(state)
 
-        print("\n=== FINAL OUTPUT ===")
-        print(final_state["code"])
+        code_path = os.path.join(output_dir, f"{task['id']}.py")
+        with open(code_path, "w", encoding="utf-8") as f:
+            f.write(final_state["code"])
 
-        if final_state.get("quality_metrics"):
-            print("\n" + format_metrics_report(final_state["quality_metrics"]))
+        # print("\n=== FINAL OUTPUT ===")
+        # print(final_state["code"])
+
+        # if final_state.get("quality_metrics"):
+        #     print("\n" + format_metrics_report(final_state["quality_metrics"]))
 
 
 if __name__ == "__main__":
     main()
 
 
-# Usage examples:
-# python -m scripts.run_single_agent                              # uses default (data/test-tasks.json)
-# python -m scripts.run_single_agent data/logic/logic-tasks.json  # run logic tasks
-# python -m scripts.run_single_agent data/strings/strings-tasks.json
-# python -m scripts.run_single_agent data/dsa/dsa-tasks.json
+
+# Latest run strategy, run_id is used to save the generated code and then to load it
+#python scripts/run_single_agent.py data/math/tasks.json --run_id run_001
+
+#output structure
+# generated/
+# └── single_agent/
+#     └── run_001/
+#         ├── largest_prime_factor.py
+#         ├── gcd.py
+#         └── ...
