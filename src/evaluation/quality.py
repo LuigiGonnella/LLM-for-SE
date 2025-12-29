@@ -132,7 +132,7 @@ def format_metrics_report(metrics: dict) -> str:
     cc = metrics.get("cyclomatic_complexity")
 
     lines = [
-        "=== Code Quality Metrics ===",
+        "Code Quality Metrics:",
         f"  Maintainability Index : {mi} ({interpret_maintainability(mi)})",
         f"  Cyclomatic Complexity : {cc} ({interpret_complexity(cc)})",
         f"  Lines of Code (LOC)   : {metrics.get('lines_of_code')}",

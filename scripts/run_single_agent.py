@@ -2,16 +2,16 @@ import argparse
 import os
 import sys
 
-from src.core.pipeline import build_single_agent_graph
-from src.utils.task_loader import load_tasks
-from src.utils.config import config
-from src.evaluation.quality import format_metrics_report
-
 # Ensure project root is on sys.path so `src` package is importable when
 # running this script directly (e.g. `python scripts/run_single_agent.py`).
 _PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 if _PROJECT_ROOT not in sys.path:
     sys.path.insert(0, _PROJECT_ROOT)
+
+from src.core.pipeline import build_single_agent_graph
+from src.utils.task_loader import load_tasks
+from src.utils.config import config
+from src.evaluation.quality import format_metrics_report
 
 
 def main():
@@ -24,13 +24,24 @@ def main():
         default="data/test-tasks.json",
         help="Path to task file (e.g., data/logic/logic-tasks.json)",
     )
+    parser.add_argument(
+        "--task-id",
+        type=str,
+        help="ID of the specific task to execute",
+    )
     args = parser.parse_args()
 
     graph = build_single_agent_graph()
     tasks = load_tasks(args.task_file)
 
+    if args.task_id:
+        tasks = [t for t in tasks if str(t.get("id")) == args.task_id]
+        if not tasks:
+            print(f"No task found with ID: {args.task_id}")
+            return
+
     for task in tasks:
-        print("\n\nQUERY:")
+        print("QUERY:")
         print(f"  ID        : {task.get('id')}")
         print(f"  Signature : {task.get('signature')}")
         print(f"  Docstring : {task.get('docstring')}")
@@ -40,7 +51,7 @@ def main():
                 print(f"    - Input : {ex.get('input')}")
                 print(f"      Output: {ex.get('output')}")
         if task.get("difficulty"):
-            print(f"  Difficulty: {task.get('difficulty')}\n\n")
+            print(f"  Difficulty: {task.get('difficulty')}\n")
 
         state = {
             "task_id": task["id"],
@@ -60,11 +71,13 @@ def main():
 
         final_state = graph.invoke(state)
 
-        print("\n=== FINAL OUTPUT ===")
-        print(final_state["code"])
+        print("\n=== RESULT ===")
+        print(f"Final code:\n  { final_state['code'].replace('\n', '\n  ') }")
 
         if final_state.get("quality_metrics"):
             print("\n" + format_metrics_report(final_state["quality_metrics"]))
+
+        print("\n" + "-"*50 + "\n") 
 
 
 if __name__ == "__main__":

@@ -13,46 +13,48 @@ from src.core.agent import (
 
 
 def analysis_node(state: AgentState) -> AgentState:
-    print(">> ANALYSIS NODE")
+    print("\n>> ANALYSIS NODE")
     state["analysis"] = analyze_task(
         signature=state["signature"],
         docstring=state["docstring"],
         examples=state.get("examples"),
         model=state["model"],
     )
+    print(f"  Analysis:\n  {state['analysis'].replace('\n', '\n  ')}\n")
     return state
 
 
 def planning_node(state: AgentState) -> AgentState:
-    print(">> PLANNING NODE")
+    print("\n>> PLANNING NODE")
     state["plan"] = plan_solution(
         analysis=state["analysis"],
         model=state["model"],
     )
+    print(f"  Plan:\n  {state['plan'].replace('\n', '\n  ')}\n")
     return state
 
 
 def generation_node(state: AgentState) -> AgentState:
-    print(">> GENERATION NODE")
+    print("\n>> GENERATION NODE")
     raw_code = generate_code(
         signature=state["signature"],
         plan=state["plan"],
         model=state["model"],
     )
     state["code"] = extract_python_code(raw_code)
+    print(f"  Generated Code:\n  {state['code'].replace('\n', '\n  ')}\n")
     return state
 
 
 def review_node(state: AgentState) -> AgentState:
-    print(">> REVIEW NODE")
+    print("\n>> REVIEW NODE")
     exec_result = execute_code(state["code"])
     state["exec_result"] = exec_result
 
     # Compute quality metrics
     metrics = compute_quality_metrics(state["code"])
     state["quality_metrics"] = metrics
-    print(format_metrics_report(metrics))
-
+    
     state["review"] = review_code(
         code=state["code"],
         model=state["model"],
@@ -60,36 +62,27 @@ def review_node(state: AgentState) -> AgentState:
         quality_metrics=metrics,
     )
 
-    print(f"Exec results: {exec_result}")
-    print(f'Reviewer result: {state["review"].splitlines()[-1]}')
+    print("  " + format_metrics_report(metrics).replace("\n", "\n  "))
+    print(f"\n  Exec results: {exec_result}")
+    print(f'  Reviewer result:\n    {state["review"].replace("\n", "\n    ")}\n')
     return state
 
 
 def refinement_node(state: AgentState) -> AgentState:
-    print(">> REFINEMENT NODE")
+    print("\n>> REFINEMENT NODE")
+
+    # EARLY EXIT if code is already correct
+    if ("review" in state and "Code is correct" in state["review"]):
+        print("  Code already correct. Skipping refinement.\n")
+        return state
 
     max_refinements = 3
     refinement_count = state.get("refinement_count", 0)
 
     while refinement_count < max_refinements:
-
-        refinement_count = state.get("refinement_count", 0)
-
-        if refinement_count < max_refinements:
-            print(f"starting refinement {refinement_count+1}/{max_refinements}\n")
-
-        # EARLY EXIT if code is already correct
-        if (
-            "review" in state
-            and "Code is correct" in state["review"]
-            and refinement_count >= 1
-        ):
-            print("Code already correct. Skipping refinement.")
-            return state
-
-        if refinement_count >= max_refinements:
-            print("Maximum refinements reached. Ending refinement.")
-            return state
+        refinement_count += 1
+        state["refinement_count"] = refinement_count
+        print(f"  Refinement: {refinement_count}/{max_refinements}\n")
 
         raw_code = refine_code(
             code=state["code"],
@@ -99,13 +92,11 @@ def refinement_node(state: AgentState) -> AgentState:
 
         # Refiner MUST output pure Python
         refined_code = extract_python_code(raw_code)
-
-        exec_result = execute_code(refined_code)
-
-        # Always update state
         state["code"] = refined_code
+
+        # Re-execute refined code
+        exec_result = execute_code(refined_code)
         state["exec_result"] = exec_result
-        state["refinement_count"] = refinement_count + 1
 
         # Recompute quality metrics for refined code
         metrics = compute_quality_metrics(refined_code)
@@ -122,10 +113,12 @@ def refinement_node(state: AgentState) -> AgentState:
 
         # Decide outcome based on reviewer verdict, not exec alone
         if "Code is correct" in review:
-            print("Refinement successful: code is correct.")
+            print("  Refinement successful: code is correct.\n")
             return state
         else:
-            print("Refinement incomplete: issues remain.")
+            print("  Refinement incomplete: issues remain.")
+    
+    print("  Maximum refinements reached. Ending refinement.\n")
 
     return state
 
