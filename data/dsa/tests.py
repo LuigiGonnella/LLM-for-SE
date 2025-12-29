@@ -156,7 +156,7 @@ def max_path_sum(root: Optional[TreeNode]) -> int:
 # ============================================================================
 
 
-class TestIsValid(unittest.TestCase):
+class test_valid_parentheses(unittest.TestCase):
     """Test cases for is_valid (Valid Parentheses) function"""
 
     # VALID TESTS
@@ -252,7 +252,7 @@ class TestIsValid(unittest.TestCase):
             is_valid({"(": ")"})
 
 
-class TestNumTrees(unittest.TestCase):
+class test_Unique_Binary_Search_Trees(unittest.TestCase):
     """Test cases for num_trees (Unique Binary Search Trees) function"""
 
     # VALID TESTS
@@ -327,7 +327,7 @@ class TestNumTrees(unittest.TestCase):
             num_trees(True)
 
 
-class TestLengthOfLIS(unittest.TestCase):
+class test_Longest_Increasing_Subsequence(unittest.TestCase):
     """Test cases for length_of_lis (Longest Increasing Subsequence) function"""
 
     # VALID TESTS
@@ -428,7 +428,7 @@ class TestLengthOfLIS(unittest.TestCase):
             length_of_lis([1, None, 3])
 
 
-class TestFindMedianSortedArrays(unittest.TestCase):
+class test_Median_of_Two_Sorted_Arrays(unittest.TestCase):
     """Test cases for find_median_sorted_arrays function"""
 
     # VALID TESTS
@@ -526,7 +526,7 @@ class TestFindMedianSortedArrays(unittest.TestCase):
             find_median_sorted_arrays([1, True], [3])
 
 
-class TestMaxPathSum(unittest.TestCase):
+class test_Binary_Tree_Maximum_Path_Sum(unittest.TestCase):
     """Test cases for max_path_sum (Binary Tree Maximum Path Sum) function"""
 
     # VALID TESTS

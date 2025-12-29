@@ -3,6 +3,7 @@ import importlib.util
 import sys
 from pathlib import Path
 import tempfile
+import io
 
 
 def run_task_tests(
@@ -13,9 +14,11 @@ def run_task_tests(
 ) -> dict:
     """
     Runs ONLY the unittest.TestCase named test_<task_id>.
+    Converts spaces in task_id to underscores for class name.
     """
 
-    class_name = f"test_{task_id}"
+    # Convert task_id to valid Python class name (replace spaces with underscores)
+    class_name = f"test_{task_id.replace(' ', '_')}"
 
     with tempfile.TemporaryDirectory() as tmpdir:
         tmpdir = Path(tmpdir)
@@ -44,7 +47,7 @@ def run_task_tests(
 
             suite = unittest.TestLoader().loadTestsFromTestCase(test_class)
             result = unittest.TextTestRunner(
-                stream=open("/dev/null", "w")
+                stream=io.StringIO()
             ).run(suite)
 
             return {

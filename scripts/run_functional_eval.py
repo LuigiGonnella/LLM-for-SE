@@ -18,7 +18,14 @@ def main():
     )
     parser.add_argument(
         "task_file",
+        nargs="?",
+        default=None,
         help="Path to tasks.json (e.g. data/math/tasks.json)"
+    )
+    parser.add_argument(
+        "--dataset",
+        choices=["math", "dsa", "logic", "strings", "lists"],
+        help="Dataset name (auto-configures task and test files)"
     )
     parser.add_argument(
         "--architecture",
@@ -32,15 +39,31 @@ def main():
     )
     parser.add_argument(
         "--tests_file",
-        default="data/math/tests.py",
-        help="Path to tests.py"
+        default=None,
+        help="Path to tests.py (auto-configured if --dataset is used)"
     )
     args = parser.parse_args()
 
-    tasks = load_tasks(args.task_file)
+    # Auto-configure from dataset if provided
+    if args.dataset:
+        dataset_map = {
+            "math": ("data/math/tasks.json", "data/math/tests.py"),
+            "dsa": ("data/dsa/tasks.json", "data/dsa/tests.py"),
+            "logic": ("data/logic/tasks.json", "data/logic/tests.py"),
+            "strings": ("data/strings/tasks.json", "data/strings/tests.py"),
+            "lists": ("data/lists/tasks.json", "data/lists/tests.py"),
+        }
+        task_file, tests_file = dataset_map[args.dataset]
+    else:
+        if args.task_file is None:
+            parser.error("Either provide task_file or use --dataset argument")
+        task_file = args.task_file
+        tests_file = args.tests_file or "data/math/tests.py"
+
+    tasks = load_tasks(task_file)
 
     generated_dir = Path("generated") / args.architecture / args.run_id
-    tests_file = Path(args.tests_file)
+    tests_file = Path(tests_file)
 
     if not generated_dir.exists():
         raise FileNotFoundError(f"Generated directory not found: {generated_dir}")
@@ -81,11 +104,14 @@ if __name__ == "__main__":
     main()
 
 
-#Usage
+#Usage - Option 1: Using --dataset
+# python scripts/run_functional_eval.py --dataset math --run_id run_001
+# python scripts/run_functional_eval.py --dataset dsa --run_id run_001
+
+#Usage - Option 2: Explicit paths
 # python scripts/run_functional_eval.py \
-#   data/math/tasks.json \
-#   --tests_file data/math/tests.py \
-#   --architecture single_agent \
+#   data/math/math-tasks.json \
+#   --tests_file data/math/math-tests.py \
 #   --run_id run_001
 
 
