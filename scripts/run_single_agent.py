@@ -12,6 +12,7 @@ from src.core.pipeline import build_single_agent_graph
 from src.utils.task_loader import load_tasks
 from src.utils.config import config
 from src.evaluation.quality import format_metrics_report
+from src.utils.task_runner import run_external_tests
 
 
 def main():
@@ -19,8 +20,12 @@ def main():
         description="Run single-agent code generation pipeline"
     )
     parser.add_argument(
-        "task_file",
-        nargs="?",
+        "--show-node-info",
+        action="store_true",
+        help="Show detailed node execution info",
+    )
+    parser.add_argument(
+        "--task-file",
         default="data/test-tasks.json",
         help="Path to task file (e.g., data/logic/logic-tasks.json)",
     )
@@ -30,9 +35,9 @@ def main():
         help="ID of the specific task to execute",
     )
     parser.add_argument(
-        "--show-node-info",
-        action="store_true",
-        help="Show detailed node execution info",
+        "--test-file",
+        type=str,
+        help="Path to the file containing external tests (e.g., data/strings/string_tests.py)",
     )
     args = parser.parse_args()
 
@@ -81,7 +86,10 @@ def main():
         print(f"Final code:\n  { final_state['code'].replace('\n', '\n  ') }")
 
         if final_state.get("quality_metrics"):
-            print("\n" + format_metrics_report(final_state["quality_metrics"]))
+            print("\n" + format_metrics_report(final_state["quality_metrics"]) + "\n")
+
+        if args.test_file and final_state.get("code"):
+            run_external_tests(task["id"], final_state["code"], args.test_file)
 
         print("\n" + "-"*50 + "\n") 
 
@@ -91,7 +99,17 @@ if __name__ == "__main__":
 
 
 # Usage examples:
-# python -m scripts.run_single_agent                              # uses default (data/test-tasks.json)
-# python -m scripts.run_single_agent data/logic/logic-tasks.json  # run logic tasks
-# python -m scripts.run_single_agent data/strings/strings-tasks.json
-# python -m scripts.run_single_agent data/dsa/dsa-tasks.json
+# Usage default test tasks file (data/test-tasks.json)
+# python -m scripts.run_single_agent
+
+# Usage with specific task file
+# python -m scripts.run_single_agent --task-file data/strings/strings-tasks.json
+
+# Usage with specific task ID
+# python -m scripts.run_single_agent --task-file data/strings/strings-tasks.json --task-id count_vowels
+
+# Usage with output of node info
+# python -m scripts.run_single_agent --task-file data/strings/strings-tasks.json --show-node-info
+
+# Usage with external test file
+# python -m scripts.run_single_agent --task-file data/strings/strings-tasks.json --task-id count_vowels --test-file data/strings/string_tests.py

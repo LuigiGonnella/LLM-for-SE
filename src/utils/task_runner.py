@@ -1,0 +1,101 @@
+import argparse
+import os
+import sys
+import tempfile
+import subprocess
+import ast
+
+
+def extract_imports(content):
+    """Extracts all import statements from the python code."""
+    try:
+        tree = ast.parse(content)
+    except SyntaxError:
+        return ""
+    
+    imports = []
+    lines = content.splitlines(keepends=True)
+    for node in tree.body:
+        if isinstance(node, (ast.Import, ast.ImportFrom)):
+            start = node.lineno - 1
+            end = node.end_lineno
+            imports.append("".join(lines[start:end]))
+    return "".join(imports)
+
+
+def extract_test_class(file_path, class_name):
+    """Extracts the source code of a specific class from a python file using AST."""
+    if not os.path.exists(file_path):
+        return None
+
+    with open(file_path, "r") as f:
+        content = f.read()
+    
+    try:
+        tree = ast.parse(content)
+    except SyntaxError:
+        return None
+
+    lines = content.splitlines(keepends=True)
+    
+    for node in tree.body:
+        if isinstance(node, ast.ClassDef) and node.name == class_name:
+            start = node.lineno - 1
+            end = node.end_lineno
+            return "".join(lines[start:end])
+            
+    return None
+
+def run_external_tests(task_id, generated_code, test_path):
+    if not os.path.exists(test_path):
+        print(f"  Test file not found: {test_path}")
+        return
+
+    # Convert task_id (e.g., "count_vowels") to CamelCase (e.g., "CountVowels")
+    camel_case_name = "".join(word.capitalize() for word in task_id.split("_"))
+    test_class_name = f"Test{camel_case_name}"
+
+    print(f"  Running external tests ({test_class_name}) from {test_path}...")
+
+    # Estrai il codice della classe di test
+    test_class_code = extract_test_class(test_path, test_class_name)
+    if not test_class_code:
+        print(f"  Can't extract class {test_class_name} from {test_path}")
+        return
+
+    # Extract imports from the test file to ensure dependencies are met
+    with open(test_path, "r") as f:
+        test_file_content = f.read()
+    extra_imports = extract_imports(test_file_content)
+
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".py", delete=False) as temp_test_file:
+        temp_file_name = temp_test_file.name
+        
+        # 1. Imports
+        temp_test_file.write("import pytest\n")
+        temp_test_file.write("import typing\n")
+        temp_test_file.write("from typing import List, Dict, Set, Optional, Any\n")
+        temp_test_file.write(extra_imports + "\n\n")
+
+        # 2. Codice Generato
+        temp_test_file.write("# --- GENERATED CODE ---\n")
+        temp_test_file.write(generated_code + "\n\n")
+        
+        # 3. Classe di Test
+        temp_test_file.write("# --- TEST CLASS ---\n")
+        temp_test_file.write(test_class_code)
+
+    # Esegui pytest
+    cmd = [sys.executable, "-m", "pytest", temp_file_name, "-v"]
+    
+    result = subprocess.run(cmd, capture_output=True, text=True)
+    
+    print("\n  Test Results:")
+    if result.returncode == 0:
+        print("  All tests passed!")
+    else:
+        print("  Some tests failed.")
+        # Stampa un riassunto (ultime 15 righe)
+        print("\n".join(result.stdout.splitlines()[-15:]))
+
+    os.remove(temp_file_name)
