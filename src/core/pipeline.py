@@ -20,7 +20,10 @@ def analysis_node(state: AgentState) -> AgentState:
         examples=state.get("examples"),
         model=state["model"],
     )
-    print(f"  Analysis:\n  {state['analysis'].replace('\n', '\n  ')}\n")
+    
+    if state.get("show_node_info"):
+        print(f"  Analysis:\n  {state['analysis'].replace('\n', '\n  ')}\n")
+    
     return state
 
 
@@ -30,7 +33,9 @@ def planning_node(state: AgentState) -> AgentState:
         analysis=state["analysis"],
         model=state["model"],
     )
-    print(f"  Plan:\n  {state['plan'].replace('\n', '\n  ')}\n")
+    if state.get("show_node_info"):
+        print(f"  Plan:\n  {state['plan'].replace('\n', '\n  ')}\n")
+    
     return state
 
 
@@ -42,7 +47,10 @@ def generation_node(state: AgentState) -> AgentState:
         model=state["model"],
     )
     state["code"] = extract_python_code(raw_code)
-    print(f"  Generated Code:\n  {state['code'].replace('\n', '\n  ')}\n")
+
+    if state.get("show_node_info"):
+        print(f"  Generated Code:\n  {state['code'].replace('\n', '\n  ')}\n")
+    
     return state
 
 
@@ -61,10 +69,13 @@ def review_node(state: AgentState) -> AgentState:
         exec_result=exec_result,
         quality_metrics=metrics,
     )
-
+     
     print("  " + format_metrics_report(metrics).replace("\n", "\n  "))
     print(f"\n  Exec results: {exec_result}")
-    print(f'  Reviewer result:\n    {state["review"].replace("\n", "\n    ")}\n')
+    
+    if state.get("show_node_info"):
+        print(f'  Reviewer result:\n    {state["review"].replace("\n", "\n    ")}\n')
+    
     return state
 
 

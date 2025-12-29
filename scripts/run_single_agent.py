@@ -29,6 +29,11 @@ def main():
         type=str,
         help="ID of the specific task to execute",
     )
+    parser.add_argument(
+        "--show-node-info",
+        action="store_true",
+        help="Show detailed node execution info",
+    )
     args = parser.parse_args()
 
     graph = build_single_agent_graph()
@@ -67,6 +72,7 @@ def main():
             "exec_result": None,
             "quality_metrics": None,
             "refinement_count": 0,
+            "show_node_info": args.show_node_info,
         }
 
         final_state = graph.invoke(state)

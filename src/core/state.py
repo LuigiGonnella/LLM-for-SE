@@ -15,3 +15,4 @@ class AgentState(TypedDict):
     exec_result: Optional[dict]
     quality_metrics: Optional[dict]
     refinement_count: Optional[int]
+    show_node_info: Optional[bool]
