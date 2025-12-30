@@ -83,6 +83,46 @@ def review_node(state: AgentState) -> AgentState:
     return state
 
 
+def refine_step(code: str, review: str, model: str) -> str:
+    """
+    Single refinement step: call LLM to refine code based on review.
+    Returns extracted Python code.
+    """
+    raw_code = refine_code(
+        code=code,
+        review=review,
+        model=model,
+    )
+    return extract_python_code(raw_code)
+
+
+def evaluate_refined_code(code: str, model: str) -> tuple[dict, str]:
+    """
+    Evaluate refined code: execute and get review (without metrics).
+    Returns (exec_result, review).
+    """
+    exec_result = execute_code(code)
+    review = review_code(
+        code=code,
+        exec_result=exec_result,
+        model=model,
+        quality_metrics=None,
+    )
+    return exec_result, review
+
+
+def should_continue_refining(review: str, refinement_count: int, max_refinements: int) -> bool:
+    """
+    Determine if we should continue refining.
+    Returns False if code is correct or max refinements reached.
+    """
+    if "Code is correct" in review and refinement_count >= 1:
+        return False
+    if refinement_count >= max_refinements:
+        return False
+    return True
+
+
 def refinement_node(state: AgentState) -> AgentState:
     print("\n>> REFINEMENT NODE")
 
@@ -95,40 +135,39 @@ def refinement_node(state: AgentState) -> AgentState:
     refinement_count = state.get("refinement_count", 0)
 
     while refinement_count < max_refinements:
-        refinement_count += 1
-        state["refinement_count"] = refinement_count
-        print(f"  Refinement: {refinement_count}/{max_refinements}")
+        if refinement_count < max_refinements:
+            print(f"starting refinement {refinement_count+1}/{max_refinements}\n")
 
-        raw_code = refine_code(
+        # Step 1: Refine the code
+        refined_code = refine_step(
             code=state["code"],
             review=state["review"],
             model=state["model"],
         )
 
-        # Refiner MUST output pure Python
-        refined_code = extract_python_code(raw_code)
-        state["code"] = refined_code
-
-        # Re-execute refined code
-        exec_result = execute_code(refined_code)
-        state["exec_result"] = exec_result
-
-        # Recompute quality metrics for refined code
-        metrics = compute_quality_metrics(refined_code)
-        state["quality_metrics"] = metrics
-
-        # Re-run reviewer after refinement
-        review = review_code(
+        # Step 2: Evaluate the refined code (no metrics yet)
+        exec_result, review = evaluate_refined_code(
             code=refined_code,
-            exec_result=exec_result,
             model=state["model"],
-            quality_metrics=metrics,
         )
-        state["review"] = review
 
-        # Decide outcome based on reviewer verdict, not exec alone
-        if "Code is correct" in review:
-            print("  Refinement successful: code is correct.\n")
+        # Step 3: Update state (no metrics yet)
+        state["code"] = refined_code
+        state["exec_result"] = exec_result
+        state["review"] = review
+        refinement_count += 1
+        state["refinement_count"] = refinement_count
+
+        # Step 4: Decide whether to continue
+        if not should_continue_refining(review, refinement_count, max_refinements):
+            # Only compute metrics on final iteration
+            metrics = compute_quality_metrics(refined_code)
+            state["quality_metrics"] = metrics
+            
+            if "Code is correct" in review:
+                print("Refinement successful: code is correct.")
+            else:
+                print("Maximum refinements reached. Ending refinement.")
             return state
         else:
             print("  Refinement incomplete: issues remain.\n")
