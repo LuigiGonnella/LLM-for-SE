@@ -1,10 +1,10 @@
 # Auto-generated from HumanEval (typed, additive, faithful)
 import math
-import unittest
+import pytest
 
 
 # =========================================================
-# HumanEval/39 — prime_fib
+# TEST FUNCTIONS - PRIME FIB
 # =========================================================
 
 
@@ -31,52 +31,52 @@ def prime_fib(n: int) -> int:
             return f[-1]
 
 
-class TestPrime_fib(unittest.TestCase):
+class TestPrimeFib:
     """Tests for prime_fib"""
 
     # ---- ORIGINAL HumanEval TESTS ----
     def test_case_1(self):
-        self.assertEqual(prime_fib(1), 2)
+        assert prime_fib(1) == 2
 
     def test_case_2(self):
-        self.assertEqual(prime_fib(2), 3)
+        assert prime_fib(2) == 3
 
     def test_case_3(self):
-        self.assertEqual(prime_fib(3), 5)
+        assert prime_fib(3) == 5
 
     def test_case_4(self):
-        self.assertEqual(prime_fib(4), 13)
+        assert prime_fib(4) == 13
 
     def test_case_5(self):
-        self.assertEqual(prime_fib(5), 89)
+        assert prime_fib(5) == 89
 
     def test_case_6(self):
-        self.assertEqual(prime_fib(6), 233)
+        assert prime_fib(6) == 233
 
     def test_case_7(self):
-        self.assertEqual(prime_fib(7), 1597)
+        assert prime_fib(7) == 1597
 
     def test_case_8(self):
-        self.assertEqual(prime_fib(8), 28657)
+        assert prime_fib(8) == 28657
 
     def test_case_9(self):
-        self.assertEqual(prime_fib(9), 514229)
+        assert prime_fib(9) == 514229
 
     def test_case_10(self):
-        self.assertEqual(prime_fib(10), 433494437)
+        assert prime_fib(10) == 433494437
 
     # ---- ADDED TYPE / DOMAIN TESTS ----
     def test_type_error(self):
-        with self.assertRaises(TypeError):
+        with pytest.raises(TypeError):
             prime_fib(3.5)
 
     def test_value_error(self):
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             prime_fib(0)
 
 
 # =========================================================
-# HumanEval/49 — modp
+# TEST FUNCTIONS - MODP
 # =========================================================
 
 
@@ -92,43 +92,43 @@ def modp(n: int, p: int) -> int:
     return ret
 
 
-class TestModp(unittest.TestCase):
+class TestModp:
     """Tests for modp"""
 
     # ---- ORIGINAL HumanEval TESTS ----
     def test_case_1(self):
-        self.assertEqual(modp(3, 5), 3)
+        assert modp(3, 5) == 3
 
     def test_case_2(self):
-        self.assertEqual(modp(1101, 101), 2)
+        assert modp(1101, 101) == 2
 
     def test_case_3(self):
-        self.assertEqual(modp(0, 101), 1)
+        assert modp(0, 101) == 1
 
     def test_case_4(self):
-        self.assertEqual(modp(3, 11), 8)
+        assert modp(3, 11) == 8
 
     def test_case_5(self):
-        self.assertEqual(modp(100, 101), 1)
+        assert modp(100, 101) == 1
 
     def test_case_6(self):
-        self.assertEqual(modp(30, 5), 4)
+        assert modp(30, 5) == 4
 
     def test_case_7(self):
-        self.assertEqual(modp(31, 5), 3)
+        assert modp(31, 5) == 3
 
     # ---- ADDED TYPE / DOMAIN TESTS ----
     def test_type_error(self):
-        with self.assertRaises(TypeError):
+        with pytest.raises(TypeError):
             modp(3.5, 5)
 
     def test_value_error(self):
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             modp(-1, 5)
 
 
 # =========================================================
-# HumanEval/59 — largest_prime_factor
+# TEST FUNCTIONS - LARGEST PRIME FACTOR
 # =========================================================
 
 
@@ -153,37 +153,37 @@ def largest_prime_factor(n: int) -> int:
     return largest
 
 
-class TestLargest_prime_factor(unittest.TestCase):
+class TestLargestPrimeFactor:
     """Tests for largest_prime_factor"""
 
     # ---- ORIGINAL HumanEval TESTS ----
     def test_case_1(self):
-        self.assertEqual(largest_prime_factor(15), 5)
+        assert largest_prime_factor(15) == 5
 
     def test_case_2(self):
-        self.assertEqual(largest_prime_factor(27), 3)
+        assert largest_prime_factor(27) == 3
 
     def test_case_3(self):
-        self.assertEqual(largest_prime_factor(63), 7)
+        assert largest_prime_factor(63) == 7
 
     def test_case_4(self):
-        self.assertEqual(largest_prime_factor(330), 11)
+        assert largest_prime_factor(330) == 11
 
     def test_case_5(self):
-        self.assertEqual(largest_prime_factor(13195), 29)
+        assert largest_prime_factor(13195) == 29
 
     # ---- ADDED TYPE / DOMAIN TESTS ----
     def test_type_error(self):
-        with self.assertRaises(TypeError):
+        with pytest.raises(TypeError):
             largest_prime_factor(10.5)
 
     def test_value_error(self):
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             largest_prime_factor(1)
 
 
 # =========================================================
-# HumanEval/76 — is_simple_power
+# TEST FUNCTIONS - IS SIMPLE POWER
 # =========================================================
 
 
@@ -202,52 +202,52 @@ def is_simple_power(x: int, n: int) -> bool:
     return power == x
 
 
-class TestIs_simple_power(unittest.TestCase):
+class TestIsSimplePower:
     """Tests for is_simple_power"""
 
     # ---- ORIGINAL HumanEval TESTS (ALL 10) ----
     def test_case_1(self):
-        self.assertEqual(is_simple_power(16, 2), True)
+        assert is_simple_power(16, 2) is True
 
     def test_case_2(self):
-        self.assertEqual(is_simple_power(143214, 16), False)
+        assert is_simple_power(143214, 16) is False
 
     def test_case_3(self):
-        self.assertEqual(is_simple_power(4, 2), True)
+        assert is_simple_power(4, 2) is True
 
     def test_case_4(self):
-        self.assertEqual(is_simple_power(9, 3), True)
+        assert is_simple_power(9, 3) is True
 
     def test_case_5(self):
-        self.assertEqual(is_simple_power(16, 4), True)
+        assert is_simple_power(16, 4) is True
 
     def test_case_6(self):
-        self.assertEqual(is_simple_power(24, 2), False)
+        assert is_simple_power(24, 2) is False
 
     def test_case_7(self):
-        self.assertEqual(is_simple_power(128, 4), False)
+        assert is_simple_power(128, 4) is False
 
     def test_case_8(self):
-        self.assertEqual(is_simple_power(12, 6), False)
+        assert is_simple_power(12, 6) is False
 
     def test_case_9(self):
-        self.assertEqual(is_simple_power(1, 1), True)
+        assert is_simple_power(1, 1) is True
 
     def test_case_10(self):
-        self.assertEqual(is_simple_power(1, 12), True)
+        assert is_simple_power(1, 12) is True
 
     # ---- ADDED TYPE / DOMAIN TESTS ----
     def test_type_error(self):
-        with self.assertRaises(TypeError):
+        with pytest.raises(TypeError):
             is_simple_power(4.0, 2)
 
     def test_value_error(self):
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             is_simple_power(0, 2)
 
 
 # =========================================================
-# HumanEval/92 — any_int
+# TEST FUNCTIONS - ANY INT
 # =========================================================
 
 
@@ -262,45 +262,41 @@ def any_int(x: float, y: float, z: float) -> bool:
     return (x + y == z) or (x + z == y) or (y + z == x)
 
 
-class TestAny_int(unittest.TestCase):
+class TestAnyInt:
     """Tests for any_int"""
 
     # ---- ORIGINAL HumanEval TESTS ----
     def test_case_1(self):
-        self.assertEqual(any_int(2, 3, 1), True)
+        assert any_int(2, 3, 1) is True
 
     def test_case_2(self):
-        self.assertEqual(any_int(2.5, 2, 3), False)
+        assert any_int(2.5, 2, 3) is False
 
     def test_case_3(self):
-        self.assertEqual(any_int(1.5, 5, 3.5), False)
+        assert any_int(1.5, 5, 3.5) is False
 
     def test_case_4(self):
-        self.assertEqual(any_int(2, 6, 2), False)
+        assert any_int(2, 6, 2) is False
 
     def test_case_5(self):
-        self.assertEqual(any_int(4, 2, 2), True)
+        assert any_int(4, 2, 2) is True
 
     def test_case_6(self):
-        self.assertEqual(any_int(2.2, 2.2, 2.2), False)
+        assert any_int(2.2, 2.2, 2.2) is False
 
     def test_case_7(self):
-        self.assertEqual(any_int(-4, 6, 2), True)
+        assert any_int(-4, 6, 2) is True
 
     def test_case_8(self):
-        self.assertEqual(any_int(2, 1, 1), True)
+        assert any_int(2, 1, 1) is True
 
     def test_case_9(self):
-        self.assertEqual(any_int(3, 4, 7), True)
+        assert any_int(3, 4, 7) is True
 
     def test_case_10(self):
-        self.assertEqual(any_int(3.0, 4, 7), False)
+        assert any_int(3.0, 4, 7) is False
 
     # ---- ADDED TYPE TEST ----
     def test_type_error(self):
-        with self.assertRaises(TypeError):
+        with pytest.raises(TypeError):
             any_int("3", 2, 1)
-
-
-if __name__ == "__main__":
-    unittest.main()

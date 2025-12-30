@@ -1,7 +1,11 @@
-import unittest
+import pytest
 from typing import List, Tuple
 
-# ===== Test 1 (Easy) =====
+LIST_ERROR = "Input must be a list"
+
+# ============================================================================
+# TEST FUNCTIONS - BELOW ZERO
+# ============================================================================
 
 
 def below_zero(operations: List[int]) -> bool:
@@ -11,7 +15,7 @@ def below_zero(operations: List[int]) -> bool:
     """
 
     if not isinstance(operations, list):
-        raise TypeError("Input must be a list")
+        raise TypeError(LIST_ERROR)
 
     balance = 0
 
@@ -26,53 +30,55 @@ def below_zero(operations: List[int]) -> bool:
     return False
 
 
-class TestBelowZero(unittest.TestCase):
+class TestBelowZero:
     """Tests for below_zero function"""
 
     # VALID TESTS
     def test_case_1(self):
-        self.assertEqual(below_zero([1, 2, -3, 1, 2, -3]), False)
+        assert below_zero([1, 2, -3, 1, 2, -3]) is False
 
     def test_case_2(self):
-        self.assertEqual(below_zero([1, 2, -4, 5, 6]), True)
+        assert below_zero([1, 2, -4, 5, 6]) is True
 
     def test_case_3(self):
-        self.assertEqual(below_zero([1, -1, 2, -2, 5, -5, 4, -4]), False)
+        assert below_zero([1, -1, 2, -2, 5, -5, 4, -4]) is False
 
     def test_case_4(self):
-        self.assertEqual(below_zero([1, -1, 2, -2, 5, -5, 4, -5]), True)
+        assert below_zero([1, -1, 2, -2, 5, -5, 4, -5]) is True
 
     def test_case_5(self):
-        self.assertEqual(below_zero([1, -2, 2, -2, 5, -5, 4, -4]), True)
+        assert below_zero([1, -2, 2, -2, 5, -5, 4, -4]) is True
 
     # BUONDARY TESTS
     def test_case_6(self):
-        self.assertEqual(below_zero([]), False)
+        assert below_zero([]) is False
 
     def test_case_7(self):
-        self.assertEqual(below_zero([0, 0, 0, 0]), False)
+        assert below_zero([0, 0, 0, 0]) is False
 
     def test_case_8(self):
-        self.assertEqual(below_zero([-1]), True)
+        assert below_zero([-1]) is True
 
     def test_case_9(self):
-        self.assertEqual(below_zero([1]), False)
+        assert below_zero([1]) is False
 
     # INVALID INPUT TESTS
     def test_case_10(self):
-        with self.assertRaises(TypeError):
+        with pytest.raises(TypeError):
             below_zero("not a list")
 
     def test_case_11(self):
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             below_zero([1, 2, "3"])
 
     def test_case_12(self):
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             below_zero([1.5, 2])
 
 
-# ===== Test 2 (Medium) =====
+# ============================================================================
+# TEST FUNCTIONS - FIND CLOSEST ELEMENTS
+# ============================================================================
 
 
 def find_closest_elements(numbers: List[float]) -> Tuple[float, float]:
@@ -80,7 +86,7 @@ def find_closest_elements(numbers: List[float]) -> Tuple[float, float]:
     other and return them in order (smaller number, larger number).
     """
     if not isinstance(numbers, list):
-        raise TypeError("Input must be a list")
+        raise TypeError(LIST_ERROR)
 
     if len(numbers) < 2:
         raise ValueError("List must contain at least two elements")
@@ -107,64 +113,58 @@ def find_closest_elements(numbers: List[float]) -> Tuple[float, float]:
     return closest_pair
 
 
-class TestFindClosestElements(unittest.TestCase):
+class TestFindClosestElements:
     """Tests for find_closest_elements function"""
 
     # VALID TESTS
     def test_case_1(self):
-        self.assertEqual(
-            find_closest_elements([1.0, 2.0, 3.9, 4.0, 5.0, 2.2]), (3.9, 4.0)
-        )
+        assert find_closest_elements([1.0, 2.0, 3.9, 4.0, 5.0, 2.2]) == (3.9, 4.0)
 
     def test_case_2(self):
-        self.assertEqual(find_closest_elements([1.0, 2.0, 5.9, 4.0, 5.0]), (5.0, 5.9))
+        assert find_closest_elements([1.0, 2.0, 5.9, 4.0, 5.0]) == (5.0, 5.9)
 
     def test_case_3(self):
-        self.assertEqual(
-            find_closest_elements([1.0, 2.0, 3.0, 4.0, 5.0, 2.2]), (2.0, 2.2)
-        )
+        assert find_closest_elements([1.0, 2.0, 3.0, 4.0, 5.0, 2.2]) == (2.0, 2.2)
 
     def test_case_4(self):
-        self.assertEqual(
-            find_closest_elements([1.0, 2.0, 3.0, 4.0, 5.0, 2.0]), (2.0, 2.0)
-        )
+        assert find_closest_elements([1.0, 2.0, 3.0, 4.0, 5.0, 2.0]) == (2.0, 2.0)
 
     def test_case_5(self):
-        self.assertEqual(find_closest_elements([1.1, 2.2, 3.1, 4.1, 5.1]), (2.2, 3.1))
+        assert find_closest_elements([1.1, 2.2, 3.1, 4.1, 5.1]) == (2.2, 3.1)
 
     def test_case_6(self):
-        self.assertEqual(find_closest_elements([-1.0, -2.0, -1.1, -5.0]), (-1.1, -1.0))
+        assert find_closest_elements([-1.0, -2.0, -1.1, -5.0]) == (-1.1, -1.0)
 
     # BOUNDARY TESTS
     def test_case_7(self):
-        self.assertEqual(find_closest_elements([1.0, 10.0]), (1.0, 10.0))
+        assert find_closest_elements([1.0, 10.0]) == (1.0, 10.0)
 
     def test_case_8(self):
-        self.assertEqual(find_closest_elements([1.0, 1.0, 1.0, 1.0]), (1.0, 1.0))
+        assert find_closest_elements([1.0, 1.0, 1.0, 1.0]) == (1.0, 1.0)
 
     def test_case_9(self):
-        self.assertEqual(
-            find_closest_elements([1.0, 1.000001, 2.0, 3.0]), (1.0, 1.000001)
-        )
+        assert find_closest_elements([1.0, 1.000001, 2.0, 3.0]) == (1.0, 1.000001)
 
     def test_case_10(self):
-        self.assertEqual(find_closest_elements([1, 2.5, 3, 10]), (2.5, 3))
+        assert find_closest_elements([1, 2.5, 3, 10]) == (2.5, 3)
 
     # INVALID INPUT TESTS
     def test_case_11(self):
-        with self.assertRaises(TypeError):
+        with pytest.raises(TypeError):
             find_closest_elements("not a list")
 
     def test_case_12(self):
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             find_closest_elements([1.0])
 
     def test_case_13(self):
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             find_closest_elements([1.0, "2.0"])
 
 
-# ===== Test 3 (Medium) =====
+# ============================================================================
+# TEST FUNCTIONS - SEARCH
+# ============================================================================
 
 
 def search(lst: List[int]) -> int:
@@ -173,7 +173,7 @@ def search(lst: List[int]) -> int:
     The frequency of an integer is the number of times it appears in the list. If no such a value exist, return -1.
     """
     if not isinstance(lst, list):
-        raise TypeError("Input must be a list")
+        raise TypeError(LIST_ERROR)
 
     if not lst:
         raise ValueError("List cannot be empty")
@@ -196,72 +196,68 @@ def search(lst: List[int]) -> int:
     return ans
 
 
-class TestSearch(unittest.TestCase):
+class TestSearch:
     """Tests for search function"""
 
     # VALID TESTS
     def test_case_1(self):
-        self.assertEqual(search([2, 3, 3, 2, 2]), 2)
+        assert search([2, 3, 3, 2, 2]) == 2
 
     def test_case_2(self):
-        self.assertEqual(
-            search(
-                [2, 7, 8, 8, 4, 8, 7, 3, 9, 6, 5, 10, 4, 3, 6, 7, 1, 7, 4, 10, 8, 1]
-            ),
-            1,
-        )
+        assert search(
+            [2, 7, 8, 8, 4, 8, 7, 3, 9, 6, 5, 10, 4, 3, 6, 7, 1, 7, 4, 10, 8, 1]
+        ) == 1
 
     def test_case_3(self):
-        self.assertEqual(search([3, 2, 8, 2]), 2)
+        assert search([3, 2, 8, 2]) == 2
 
     def test_case_4(self):
-        self.assertEqual(search([8, 8, 3, 6, 5, 6, 4]), -1)
+        assert search([8, 8, 3, 6, 5, 6, 4]) == -1
 
     def test_case_5(self):
-        self.assertEqual(
-            search([5, 5, 3, 9, 5, 6, 3, 2, 8, 5, 6, 10, 10, 6, 8, 4, 10, 7, 7, 10, 8]),
-            -1,
-        )
+        assert search([5, 5, 3, 9, 5, 6, 3, 2, 8, 5, 6, 10, 10, 6, 8, 4, 10, 7, 7, 10, 8]) == -1
 
     def test_case_6(self):
-        self.assertEqual(search([10]), -1)
+        assert search([10]) == -1
 
     # BOUNDARY TESTS
     def test_case_7(self):
-        self.assertEqual(search([3, 3]), -1)
+        assert search([3, 3]) == -1
 
     def test_case_8(self):
-        self.assertEqual(search([8, 8, 8, 8, 8, 8, 8, 8]), 8)
+        assert search([8, 8, 8, 8, 8, 8, 8, 8]) == 8
 
     def test_case_9(self):
-        self.assertEqual(search([4, 1, 4, 1, 4, 4]), 4)
+        assert search([4, 1, 4, 1, 4, 4]) == 4
 
     def test_case_10(self):
-        self.assertEqual(search([5, 5, 5, 5, 1]), 1)
+        assert search([5, 5, 5, 5, 1]) == 1
 
     # INVALID INPUT TESTS
     def test_case_11(self):
-        with self.assertRaises(TypeError):
+        with pytest.raises(TypeError):
             search("not a list")
 
     def test_case_12(self):
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             search([])
 
     def test_case_13(self):
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             search([1, 2, "3"])
 
     def test_case_14(self):
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             search([1, 2, 0])
 
     def test_case_15(self):
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             search([1, 2, -1])
 
 
-# ===== Test 4 (Hard) =====
+# ============================================================================
+# TEST FUNCTIONS - TRIPLES SUM TO ZERO
+# ============================================================================
 
 
 def triples_sum_to_zero(numbers: List[int]) -> bool:
@@ -269,7 +265,7 @@ def triples_sum_to_zero(numbers: List[int]) -> bool:
     It returns True if there are three distinct elements in the list that sum to zero, and False otherwise.
     """
     if not isinstance(numbers, list):
-        raise TypeError("Input must be a list")
+        raise TypeError(LIST_ERROR)
 
     for e in numbers:
         if not isinstance(e, int):
@@ -284,62 +280,64 @@ def triples_sum_to_zero(numbers: List[int]) -> bool:
     return False
 
 
-class TestTriplesSumToZero(unittest.TestCase):
+class TestTriplesSumToZero:
     """Tests for triples_sum_to_zero function"""
 
     # VALID TESTS
     def test_case_1(self):
-        self.assertEqual(triples_sum_to_zero([1, 3, 5, 0]), False)
+        assert triples_sum_to_zero([1, 3, 5, 0]) is False
 
     def test_case_2(self):
-        self.assertEqual(triples_sum_to_zero([1, 3, -2, 1]), True)
+        assert triples_sum_to_zero([1, 3, -2, 1]) is True
 
     def test_case_3(self):
-        self.assertEqual(triples_sum_to_zero([1, 2, 3, 7]), False)
+        assert triples_sum_to_zero([1, 2, 3, 7]) is False
 
     def test_case_4(self):
-        self.assertEqual(triples_sum_to_zero([2, 4, -5, 3, 9, 7]), True)
+        assert triples_sum_to_zero([2, 4, -5, 3, 9, 7]) is True
 
     def test_case_5(self):
-        self.assertEqual(triples_sum_to_zero([1]), False)
+        assert triples_sum_to_zero([1]) is False
 
     # BOUNDARY TESTS
     def test_case_6(self):
-        self.assertEqual(triples_sum_to_zero([1, 3, 5, -100]), False)
+        assert triples_sum_to_zero([1, 3, 5, -100]) is False
 
     def test_case_7(self):
-        self.assertEqual(triples_sum_to_zero([100, 3, 5, -100]), False)
+        assert triples_sum_to_zero([100, 3, 5, -100]) is False
 
     def test_case_8(self):
-        self.assertEqual(triples_sum_to_zero([1, 2]), False)
+        assert triples_sum_to_zero([1, 2]) is False
 
     def test_case_9(self):
-        self.assertEqual(triples_sum_to_zero([0, 0, 0]), True)
+        assert triples_sum_to_zero([0, 0, 0]) is True
 
     def test_case_10(self):
-        self.assertEqual(triples_sum_to_zero([-10, 5, 5]), True)
+        assert triples_sum_to_zero([-10, 5, 5]) is True
 
     def test_case_11(self):
-        self.assertEqual(triples_sum_to_zero([1, 2, 3]), False)
+        assert triples_sum_to_zero([1, 2, 3]) is False
 
     def test_case_12(self):
-        self.assertEqual(triples_sum_to_zero([]), False)
+        assert triples_sum_to_zero([]) is False
 
     # INVALID INPUT TESTS
     def test_case_13(self):
-        with self.assertRaises(TypeError):
+        with pytest.raises(TypeError):
             triples_sum_to_zero("not a list")
 
     def test_case_14(self):
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             triples_sum_to_zero([1, 2, "3"])
 
     def test_case_15(self):
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             triples_sum_to_zero([1, 2, 3.5])
 
 
-# ===== Test 5 (Hard) =====
+# ============================================================================
+# TEST FUNCTIONS - MIN PATH
+# ============================================================================
 
 
 def minPath(grid: List[List[int]], k: int) -> List[int]:
@@ -410,77 +408,74 @@ def minPath(grid: List[List[int]], k: int) -> List[int]:
     return ans
 
 
-class TestMinPath(unittest.TestCase):
+class TestMinPath:
     """Tests for minPath function"""
 
     # VALID TESTS
     def test_case_1(self):
-        self.assertEqual(minPath([[1, 2, 3], [4, 5, 6], [7, 8, 9]], 3), [1, 2, 1])
+        assert minPath([[1, 2, 3], [4, 5, 6], [7, 8, 9]], 3) == [1, 2, 1]
 
     def test_case_2(self):
-        self.assertEqual(minPath([[5, 9, 3], [4, 1, 6], [7, 8, 2]], 1), [1])
+        assert minPath([[5, 9, 3], [4, 1, 6], [7, 8, 2]], 1) == [1]
 
     def test_case_3(self):
-        self.assertEqual(
-            minPath([[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12], [13, 14, 15, 16]], 4),
-            [1, 2, 1, 2],
-        )
+        assert minPath(
+            [[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12], [13, 14, 15, 16]], 4
+        ) == [1, 2, 1, 2]
 
     def test_case_4(self):
-        self.assertEqual(
-            minPath([[8, 14, 9, 2], [6, 4, 13, 15], [5, 7, 1, 12], [3, 10, 11, 16]], 5),
-            [1, 7, 1, 7, 1],
-        )
+        assert minPath(
+            [[8, 14, 9, 2], [6, 4, 13, 15], [5, 7, 1, 12], [3, 10, 11, 16]], 5
+        ) == [1, 7, 1, 7, 1]
 
     def test_case_5(self):
-        self.assertEqual(
-            minPath([[2, 7, 4], [3, 1, 5], [6, 8, 9]], 8), [1, 3, 1, 3, 1, 3, 1, 3]
-        )
+        assert minPath([[2, 7, 4], [3, 1, 5], [6, 8, 9]], 8) == [
+            1,
+            3,
+            1,
+            3,
+            1,
+            3,
+            1,
+            3,
+        ]
 
     # BOUNDARY TESTS
     def test_case_6(self):
-        self.assertEqual(minPath([[1, 2], [3, 4]], 10), [1, 2, 1, 2, 1, 2, 1, 2, 1, 2])
+        assert minPath([[1, 2], [3, 4]], 10) == [1, 2, 1, 2, 1, 2, 1, 2, 1, 2]
 
     def test_case_7(self):
-        self.assertEqual(minPath([[1, 3], [4, 2]], 10), [1, 3, 1, 3, 1, 3, 1, 3, 1, 3])
+        assert minPath([[1, 3], [4, 2]], 10) == [1, 3, 1, 3, 1, 3, 1, 3, 1, 3]
 
     # INVALID INPUT TESTS
     def test_case_8(self):
-        with self.assertRaises(TypeError):
+        with pytest.raises(TypeError):
             minPath("not a list", 3)
 
     def test_case_9(self):
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             minPath([[1]], 3)
 
     def test_case_10(self):
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             minPath([[1, 2], [3]], 3)
 
     def test_case_11(self):
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             minPath([[1, 2], [2, 4]], 3)
 
     def test_case_12(self):
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             minPath([[1, 2], [3, "4"]], 3)
 
     def test_case_13(self):
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             minPath([[1, 2], [3, 4]], 0)
 
     def test_case_14(self):
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             minPath([[1, 2], [3, 4]], -5)
 
     def test_case_15(self):
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             minPath([[1, 2], [3, 5]], 3)
-
-
-# ============================================================================
-# RUN TESTS
-# ============================================================================
-
-if __name__ == "__main__":
-    unittest.main()
