@@ -86,7 +86,7 @@ def preprocessing_task(query: str, model: str) -> AgentState:
     """)
 
     result = call_llm(user_prompt=prompt, model=model)
-    task_dict = json.load(result)
+    task_dict = json.loads(result)
     state["task_id"] = task_dict["task_id"]
     state["signature"] = task_dict["signature"]
     state["docstring"] = task_dict["docstring"]
