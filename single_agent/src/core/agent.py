@@ -85,6 +85,8 @@ def preprocessing_task(query: str, model: str) -> AgentState:
         - Do not include additional commentary, formatting, or markdown.
 
     """)
+    
+    prompt += f"\n\nUSER QUERY:\n{query}\n\nYour JSON output:"
 
     result = call_llm(user_prompt=prompt, model=model)
     print(result)
