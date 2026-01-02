@@ -5,10 +5,10 @@ Defines the single-agent cognitive steps.
 Each function corresponds to ONE node in the LangGraph pipeline.
 """
 
-from src.core.llm import call_llm
-from src.core.state import AgentState
+from single_agent.src.core.llm import call_llm
+from single_agent.src.core.state import AgentState
 import json
-from src.utils.config import config
+from single_agent.src.utils.config import config
 
 
 def preprocessing_task(query: str, model: str) -> AgentState:

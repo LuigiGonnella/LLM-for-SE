@@ -13,7 +13,7 @@ from single_agent.src.core.agent import (
 @pytest.fixture
 def mock_llm():
     """Fixture to mock the call_llm function"""
-    with patch("src.core.agent.call_llm") as mock:
+    with patch("single_agent.src.core.agent.call_llm") as mock:
         yield mock
 
 
