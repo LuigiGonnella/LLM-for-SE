@@ -13,6 +13,7 @@ from src.utils.task_loader import load_tasks
 from src.utils.config import config
 from src.evaluation.quality import format_metrics_report
 from src.utils.test_runner import run_external_tests
+import json
 
 
 def main():
@@ -63,27 +64,22 @@ def main():
         if task.get("difficulty"):
             print(f"  Difficulty: {task.get('difficulty')}\n")
 
-        state = {
+        query_dict = {
             "task_id": task["id"],
             "signature": task["signature"],
             "docstring": task["docstring"],
             "examples": task.get("examples"),
             "difficulty": task.get("difficulty"),
-            "model": config.model_name,
-            "analysis": None,
-            "plan": None,
-            "code": None,
-            "review": None,
-            "exec_result": None,
-            "quality_metrics": None,
-            "refinement_count": 0,
             "show_node_info": args.show_node_info,
         }
+        query = json.dumps(query_dict, ensure_ascii=False, indent=2)
+        
 
-        final_state = graph.invoke(state)
+        final_state = graph.invoke(query)
 
         print("\n=== RESULT ===")
-        print(f"Final code:\n  { final_state['code'].replace('\n', '\n  ') }")
+        indented_code = final_state['code'].replace('\n', '\n  ')
+        print(f"Final code:\n  {indented_code}")
 
         if final_state.get("quality_metrics"):
             print("\n" + format_metrics_report(final_state["quality_metrics"]) + "\n")

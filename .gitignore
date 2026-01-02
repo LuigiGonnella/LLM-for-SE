@@ -7,6 +7,7 @@ __pycache__/
 # Virtual environments
 .venv/
 venv/
+condaenv.*
 
 # IDE
 .vscode/
@@ -22,3 +23,7 @@ experiments/
 
 # Models (do NOT commit large files)
 models/
+
+
+#notebooks
+*.ipynb

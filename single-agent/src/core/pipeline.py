@@ -5,12 +5,32 @@ from src.utils.code_parser import extract_python_code
 from src.evaluation.quality import compute_quality_metrics, format_metrics_report
 from src.core.agent import (
     analyze_task,
+    preprocessing_task,
     plan_solution,
     generate_code,
     review_code,
     refine_code,
 )
+from src.utils.config import config
 
+def preprocessing_node(query: str) -> AgentState:
+    print("\n>> PREPROCESSING NODE")
+    state = preprocessing_task(
+        query = query,
+        model=config.model,
+    )
+    
+    if state.get("show_node_info"):
+        preprocessing_text = {}
+        preprocessing_text['task_id'] = state['task_id']
+        preprocessing_text['signature'] = state.get('signature')
+        preprocessing_text['docstring'] = state.get('docstring')
+        preprocessing_text['examples'] = state.get('examples')
+        preprocessing_text['model'] = state.get('model')
+        preprocessing_text['show_nodes_info'] = state.get('show_nodes_info')
+
+        print(f"  Processed input:\n    {preprocessing_text}\n")
+    return state
 
 def analysis_node(state: AgentState) -> AgentState:
     print("\n>> ANALYSIS NODE")
@@ -180,13 +200,15 @@ def refinement_node(state: AgentState) -> AgentState:
 def build_single_agent_graph():
     graph = StateGraph(AgentState)
 
+    graph.add_node("preprocessing", preprocessing_node)
     graph.add_node("analysis", analysis_node)
     graph.add_node("planning", planning_node)
     graph.add_node("generation", generation_node)
     graph.add_node("review", review_node)
     graph.add_node("refinement", refinement_node)
 
-    graph.add_edge(START, "analysis")
+    graph.add_edge(START, "preprocessing")
+    graph.add_edge("preprocessing", "analysis")
     graph.add_edge("analysis", "planning")
     graph.add_edge("planning", "generation")
     graph.add_edge("generation", "review")

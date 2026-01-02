@@ -6,6 +6,94 @@ Each function corresponds to ONE node in the LangGraph pipeline.
 """
 
 from src.core.llm import call_llm
+from src.core.state import AgentState
+import json
+from src.utils.config import config
+
+
+def preprocessing_task(query: str, model: str) -> AgentState:
+    state = AgentState()
+
+    prompt = ("""
+        You are an expert software engineer and task analyzer. Your job is to transform any programming task described by the user into a structured task format suitable for downstream processing. 
+
+        Your output will populate the following AgentState fields:
+
+        - task_id: a short, snake_case identifier for the task.
+        - signature: a valid Python function signature with type hints.
+        - docstring: a concise explanation of the function’s purpose and behavior.
+        - examples: a JSON list of input/output pairs demonstrating expected behavior.
+        - show_nodes_info: a boolean to keep as it is if already provided, to set at True if not provided.
+
+        REQUIREMENTS:
+
+        1. ALWAYS produce output in **strict JSON format** with the following structure:
+
+        {
+            "task_id": "**TASK_ID**",
+            "signature": "**FUNCTION_SIGNATURE**",
+            "docstring": "**FUNCTION_DESCRIPTION**",
+            "examples": [
+                {
+                    "input": "**FIRST_INPUT**",
+                    "output": "**FIRST_OUTPUT**"
+                },
+                {
+                    "input": "**SECOND_INPUT**",
+                    "output": "**SECOND_OUTPUT**"
+                }
+            ],
+            "show_nodes_info": True
+        }
+
+        2. The task_id should be concise, descriptive, and snake_case.
+        3. The signature must include Python type hints and be syntactically correct.
+        4. Docstring should clearly describe the task, inputs, expected outputs, and any special rules.
+        5. Include at least 2 examples. Inputs and outputs must be represented as JSON-serializable values (strings, numbers, lists, dicts, etc.).
+        6. Difficulty, analysis, plan, code, review, exec_result, quality_metrics, refinement_count, and show_node_info **should not be included**—populate only the four fields above.
+        7. Do NOT generate any explanation outside the JSON object.
+        8. Handle edge cases if they can be inferred from the task description.
+
+        EXAMPLE:
+
+        User Query: "Write a function that counts the vowels in a string."
+
+        Output:
+
+        {
+            "task_id": "count_vowels",
+            "signature": "def count_vowels(s: str) -> int:",
+            "docstring": "Count the number of vowels (a, e, i, o, u) in the input string, case-insensitive.",
+            "examples": [
+                {
+                    "input": "'OpenAI ChatGPT'",
+                    "output": "5"
+                },
+                {
+                    "input": "'Hello World'",
+                    "output": "3"
+                }
+            ],
+            "show_nodes_info": True
+        }
+
+        INSTRUCTIONS:
+
+        - Always return valid JSON.
+        - Only fill the five fields: task_id, signature, docstring, examples, show_nodes_info.
+        - Do not include additional commentary, formatting, or markdown.
+
+    """)
+
+    result = call_llm(user_prompt=prompt, model=model)
+    task_dict = json.load(result)
+    state["task_id"] = task_dict["task_id"]
+    state["signature"] = task_dict["signature"]
+    state["docstring"] = task_dict["docstring"]
+    state["examples"] = task_dict["examples"]
+    state['show_node_info'] = task_dict["show_node_info"]
+
+    return state
 
 
 def analyze_task(
@@ -32,6 +120,7 @@ def analyze_task(
         "- Bullet list describing what the function must do\n\n"
         "### Inputs and Outputs\n"
         "- Describe expected input types, structure, and valid ranges\n"
+        "- Provide the refactored input task in JSON format"
         "- Describe output type, format, and guarantees\n\n"
         "### Constraints\n"
         "- Bullet list of constraints (time, space, value ranges, rules)\n\n"
