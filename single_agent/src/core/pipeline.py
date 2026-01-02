@@ -13,22 +13,42 @@ from single_agent.src.core.agent import (
 )
 from single_agent.src.utils.config import config
 
-def preprocessing_node(query: dict) -> AgentState:
+def preprocessing_node(input_state: dict) -> AgentState:
     print("\n>> PREPROCESSING NODE")
-    state = preprocessing_task(
-        query = query['query'], #string unwrap
-        model=config.model_name,
-    )
+    
+    # Check if query is already structured (has task fields) or is a natural language string
+    if 'query' in input_state:
+        query_str = input_state['query']
+        # Try to parse as JSON (structured task)
+        try:
+            import json
+            query_dict = json.loads(query_str)
+            # If successful and has required fields, use directly
+            if all(k in query_dict for k in ['task_id', 'signature', 'docstring']):
+                state = AgentState(query_dict)
+                if 'model' not in state:
+                    state['model'] = config.model_name
+            else:
+                # Natural language query, needs LLM preprocessing
+                state = preprocessing_task(query=query_str, model=config.model_name)
+        except (json.JSONDecodeError, TypeError):
+            # Not JSON, treat as natural language query
+            state = preprocessing_task(query=query_str, model=config.model_name)
+    else:
+        # Input state already has structured fields
+        state = AgentState(input_state)
+        if 'model' not in state:
+            state['model'] = config.model_name
     
     if state.get("show_node_info"):
-        preprocessing_text = {}
-        preprocessing_text['task_id'] = state['task_id']
-        preprocessing_text['signature'] = state.get('signature')
-        preprocessing_text['docstring'] = state.get('docstring')
-        preprocessing_text['examples'] = state.get('examples')
-        preprocessing_text['model'] = state.get('model')
-        preprocessing_text['show_node_info'] = state.get('show_node_info')
-
+        preprocessing_text = {
+            'task_id': state['task_id'],
+            'signature': state.get('signature'),
+            'docstring': state.get('docstring'),
+            'examples': state.get('examples'),
+            'model': state.get('model'),
+            'show_node_info': state.get('show_node_info')
+        }
         print(f"  Processed input:\n    {preprocessing_text}\n")
     return state
 
