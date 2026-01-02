@@ -17,7 +17,7 @@ def preprocessing_node(query: dict) -> AgentState:
     print("\n>> PREPROCESSING NODE")
     state = preprocessing_task(
         query = query['query'], #string unwrap
-        model=config.model,
+        model=config.model_name,
     )
     
     if state.get("show_node_info"):
