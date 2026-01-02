@@ -73,9 +73,10 @@ def main():
             "show_node_info": args.show_node_info,
         }
         query = json.dumps(query_dict, ensure_ascii=False, indent=2)
-        
+        state = {'query': query} #generalize to always process a string (preprocessing_node will unwrap the string)
 
-        final_state = graph.invoke(query)
+
+        final_state = graph.invoke(state)
 
         print("\n=== RESULT ===")
         indented_code = final_state['code'].replace('\n', '\n  ')

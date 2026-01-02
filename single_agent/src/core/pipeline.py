@@ -13,10 +13,10 @@ from single_agent.src.core.agent import (
 )
 from single_agent.src.utils.config import config
 
-def preprocessing_node(query: str) -> AgentState:
+def preprocessing_node(query: dict) -> AgentState:
     print("\n>> PREPROCESSING NODE")
     state = preprocessing_task(
-        query = query,
+        query = query['query'], #string unwrap
         model=config.model,
     )
     
