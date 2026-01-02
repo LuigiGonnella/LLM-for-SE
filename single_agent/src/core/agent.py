@@ -98,6 +98,7 @@ def preprocessing_task(query: str, model: str) -> AgentState:
     state["signature"] = task_dict["signature"]
     state["docstring"] = task_dict["docstring"]
     state["examples"] = task_dict["examples"]
+    state['model'] = model
     state['show_node_info'] = task_dict["show_node_info"]
 
     return state
