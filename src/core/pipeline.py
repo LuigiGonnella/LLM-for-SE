@@ -20,9 +20,9 @@ def analysis_node(state: AgentState) -> AgentState:
         examples=state.get("examples"),
         model=state["model"],
     )
-    
+
     if state.get("show_node_info"):
-        analysis_text = state['analysis'].replace('\n', '\n    ')
+        analysis_text = state["analysis"].replace("\n", "\n    ")
         print(f"  Analysis:\n    {analysis_text}\n")
     return state
 
@@ -34,9 +34,9 @@ def planning_node(state: AgentState) -> AgentState:
         model=state["model"],
     )
     if state.get("show_node_info"):
-        plan_text = state['plan'].replace('\n', '\n    ')
+        plan_text = state["plan"].replace("\n", "\n    ")
         print(f"  Plan:\n    {plan_text}\n")
-    
+
     return state
 
 
@@ -50,9 +50,9 @@ def generation_node(state: AgentState) -> AgentState:
     state["code"] = extract_python_code(raw_code)
 
     if state.get("show_node_info"):
-        code_text = state['code'].replace('\n', '\n    ')
+        code_text = state["code"].replace("\n", "\n    ")
         print(f"  Generated Code:\n    {code_text}\n")
-    
+
     return state
 
 
@@ -64,22 +64,22 @@ def review_node(state: AgentState) -> AgentState:
     # Compute quality metrics
     metrics = compute_quality_metrics(state["code"])
     state["quality_metrics"] = metrics
-    
+
     state["review"] = review_code(
         code=state["code"],
         model=state["model"],
         exec_result=exec_result,
         quality_metrics=metrics,
     )
-     
+
     if state.get("show_node_info"):
         metrics_report = format_metrics_report(metrics).replace("\n", "\n  ")
         print("  " + metrics_report)
         print(f"\n  Exec results:\n    {exec_result}\n")
-        
+
         review_text = state["review"].replace("\n", "\n    ")
-        print(f'  Reviewer result:\n    {review_text}\n')
-    
+        print(f"  Reviewer result:\n    {review_text}\n")
+
     return state
 
 
@@ -111,7 +111,9 @@ def evaluate_refined_code(code: str, model: str) -> tuple[dict, str]:
     return exec_result, review
 
 
-def should_continue_refining(review: str, refinement_count: int, max_refinements: int) -> bool:
+def should_continue_refining(
+    review: str, refinement_count: int, max_refinements: int
+) -> bool:
     """
     Determine if we should continue refining.
     Returns False if code is correct or max refinements reached.
@@ -127,7 +129,7 @@ def refinement_node(state: AgentState) -> AgentState:
     print("\n>> REFINEMENT NODE")
 
     # EARLY EXIT if code is already correct
-    if ("review" in state and "Code is correct" in state["review"]):
+    if "review" in state and "Code is correct" in state["review"]:
         print("  Code already correct. Skipping refinement.\n")
         return state
 
@@ -163,7 +165,7 @@ def refinement_node(state: AgentState) -> AgentState:
             # Only compute metrics on final iteration
             metrics = compute_quality_metrics(refined_code)
             state["quality_metrics"] = metrics
-            
+
             if "Code is correct" in review:
                 print("Refinement successful: code is correct.")
             else:
@@ -171,7 +173,7 @@ def refinement_node(state: AgentState) -> AgentState:
             return state
         else:
             print("  Refinement incomplete: issues remain.\n")
-    
+
     print("  Maximum refinements reached. Ending refinement.\n")
 
     return state

@@ -133,17 +133,17 @@ class TestModp:
 
 
 def largest_prime_factor(n: int) -> int:
-      largest_prime = 0
-      factor = 2
-      
-      while n > 1:
-          if n % factor == 0:
-              largest_prime = factor
-              while n % factor == 0:
-                  n //= factor
-          factor += 1
-      
-      return largest_prime
+    largest_prime = 0
+    factor = 2
+
+    while n > 1:
+        if n % factor == 0:
+            largest_prime = factor
+            while n % factor == 0:
+                n //= factor
+        factor += 1
+
+    return largest_prime
 
 
 class TestLargestPrimeFactor:

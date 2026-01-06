@@ -476,12 +476,15 @@ class TestFindMedianSortedArrays:
 # TEST FUNCTIONS - MAX PATH SUM
 # ============================================================================
 
+
 class TreeNode:
-        """Definition for a binary tree node."""
-        def __init__(self, val=0, left=None, right=None):
-            self.val = val
-            self.left = left
-            self.right = right
+    """Definition for a binary tree node."""
+
+    def __init__(self, val=0, left=None, right=None):
+        self.val = val
+        self.left = left
+        self.right = right
+
 
 def max_path_sum(root: Optional[TreeNode]) -> int:
     """Given the root of a binary tree, return the maximum path sum of any non-empty path."""
@@ -511,6 +514,7 @@ def max_path_sum(root: Optional[TreeNode]) -> int:
 
 class TestMaxPathSum:
     """Test cases for max_path_sum (Binary Tree Maximum Path Sum) function"""
+
     def build_tree_from_list(self, values: List) -> Optional[TreeNode]:
         """Build a binary tree from a level-order list representation."""
         if not values or values[0] is None:

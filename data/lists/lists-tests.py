@@ -204,9 +204,10 @@ class TestSearch:
         assert search([2, 3, 3, 2, 2]) == 2
 
     def test_case_2(self):
-        assert search(
-            [2, 7, 8, 8, 4, 8, 7, 3, 9, 6, 5, 10, 4, 3, 6, 7, 1, 7, 4, 10, 8, 1]
-        ) == 1
+        assert (
+            search([2, 7, 8, 8, 4, 8, 7, 3, 9, 6, 5, 10, 4, 3, 6, 7, 1, 7, 4, 10, 8, 1])
+            == 1
+        )
 
     def test_case_3(self):
         assert search([3, 2, 8, 2]) == 2
@@ -215,7 +216,10 @@ class TestSearch:
         assert search([8, 8, 3, 6, 5, 6, 4]) == -1
 
     def test_case_5(self):
-        assert search([5, 5, 3, 9, 5, 6, 3, 2, 8, 5, 6, 10, 10, 6, 8, 4, 10, 7, 7, 10, 8]) == -1
+        assert (
+            search([5, 5, 3, 9, 5, 6, 3, 2, 8, 5, 6, 10, 10, 6, 8, 4, 10, 7, 7, 10, 8])
+            == -1
+        )
 
     def test_case_6(self):
         assert search([10]) == -1
