@@ -102,7 +102,9 @@ def print_results_table(model, results):
         domain_total = domain_passed + domain_failed
         domain_rate = (domain_passed / domain_total * 100) if domain_total > 0 else 0
         print("-" * 80)
-        print(f"{'Subtotal':<45} {domain_passed:>8} {domain_failed:>8} {domain_rate:>9.2f}%")
+        print(
+            f"{'Subtotal':<45} {domain_passed:>8} {domain_failed:>8} {domain_rate:>9.2f}%"
+        )
         print()
 
         total_passed += domain_passed
