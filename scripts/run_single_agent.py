@@ -89,7 +89,7 @@ def main():
         final_state = graph.invoke(state)
 
         print("\n=== RESULT ===")
-        code_indented = final_state['code'].replace('\n', '\n  ')
+        code_indented = final_state["code"].replace("\n", "\n  ")
         print(f"Final code:\n  {code_indented}")
 
         if final_state.get("quality_metrics"):
@@ -98,7 +98,7 @@ def main():
         if args.test_file and final_state.get("code"):
             run_external_tests(task["id"], final_state["code"], args.test_file)
 
-        print("\n" + "-"*100 + "\n") 
+        print("\n" + "-" * 100 + "\n")
 
 
 if __name__ == "__main__":

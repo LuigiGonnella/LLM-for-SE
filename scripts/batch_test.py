@@ -99,8 +99,12 @@ def print_results_table(model, results):
 def main():
     parser = argparse.ArgumentParser(description="Batch test single-agent pipeline")
     parser.add_argument("--models", nargs="+", default=[config.model_name])
-    parser.add_argument("--domains", nargs="+", default=list(TASK_DOMAINS.keys()),
-                        choices=list(TASK_DOMAINS.keys()))
+    parser.add_argument(
+        "--domains",
+        nargs="+",
+        default=list(TASK_DOMAINS.keys()),
+        choices=list(TASK_DOMAINS.keys()),
+    )
     parser.add_argument("--output", type=str, help="Output CSV file")
     parser.add_argument("--task-id", type=str, help="Run only specific task")
     args = parser.parse_args()
@@ -132,15 +136,29 @@ def main():
                 model_results.append(result)
                 all_results.append(result)
 
-                status = "PASS" if result["failed"] == 0 and result["passed"] > 0 else "FAIL"
-                print(f"{status} ({result['passed']}/{result['passed']+result['failed']})")
+                status = (
+                    "PASS" if result["failed"] == 0 and result["passed"] > 0 else "FAIL"
+                )
+                print(
+                    f"{status} ({result['passed']}/{result['passed']+result['failed']})"
+                )
 
         print_results_table(model, model_results)
 
     if args.output:
         with open(args.output, "w", newline="") as f:
-            writer = csv.DictWriter(f, fieldnames=["model", "domain", "task_id",
-                                                   "difficulty", "passed", "failed", "error"])
+            writer = csv.DictWriter(
+                f,
+                fieldnames=[
+                    "model",
+                    "domain",
+                    "task_id",
+                    "difficulty",
+                    "passed",
+                    "failed",
+                    "error",
+                ],
+            )
             writer.writeheader()
             writer.writerows(all_results)
         print(f"Results saved to: {args.output}")
