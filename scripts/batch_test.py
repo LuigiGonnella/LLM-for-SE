@@ -10,13 +10,7 @@ Usage:
 
 import argparse
 import csv
-import os
-import sys
 from datetime import datetime
-
-_PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-if _PROJECT_ROOT not in sys.path:
-    sys.path.insert(0, _PROJECT_ROOT)
 
 from src.core.pipeline import build_single_agent_graph
 from src.utils.task_loader import load_tasks
