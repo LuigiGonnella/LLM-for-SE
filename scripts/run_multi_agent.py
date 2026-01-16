@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from src.core.pipeline_multi import build_multi_agent_graph
+from src.core.multi_agent.pipeline import build_multi_agent_graph
 from src.utils.task_loader import load_tasks
 
 

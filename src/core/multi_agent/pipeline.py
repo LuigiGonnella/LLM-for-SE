@@ -11,12 +11,12 @@ Only exec_result summary is provided.
 from langgraph.graph import StateGraph, START, END
 
 from src.core.state import AgentState
-from src.core.agents.planner import plan_task
-from src.core.agents.coder import generate_code
-from src.core.agents.critic import critique
+from src.core.multi_agent.agents.planner import plan_task
+from src.core.multi_agent.agents.coder import generate_code
+from src.core.multi_agent.agents.critic import critique
 
 from src.tools.executor import run_tests  # adjust if your executor function name differs
-from src.evaluation.quality import compute_quality_metrics  # adjust if differs
+from src.evaluation.quality_metrics import compute_quality_metrics  # adjust if differs
 
 
 def _exec_summary(exec_result: dict | None) -> str | None:
