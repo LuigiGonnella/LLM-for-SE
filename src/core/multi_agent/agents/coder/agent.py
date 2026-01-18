@@ -5,12 +5,12 @@ import json
 
 
 class CoderAgent:
-    def __init__(self, model: str = "mistral"):
+    def __init__(self, model: str = "deepseek"):
         """
         Initialize the coder agent.
         
         Args:
-            model: Ollama model to use for code generation
+            model: Ollama model to use for code generation (default: deepseek)
         """
         self.model = model
         self.graph = build_coder_graph()

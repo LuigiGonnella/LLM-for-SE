@@ -249,8 +249,11 @@ errors: List[str]                            # All errors accumulated
 ```python
 from src.core.multi_agent.agents.coder.agent import CoderAgent
 
-# Initialize agent
-coder = CoderAgent(model="mistral")
+# Initialize agent (defaults to deepseek model)
+coder = CoderAgent()
+
+# Or specify a different model
+coder = CoderAgent(model="deepseek")
 
 # Generate code
 result = coder.generate_code(
