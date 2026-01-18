@@ -8,6 +8,7 @@ class Model(str, Enum):
     QWEN_2_5_CODER_7B = "qwen2.5-coder:7b-instruct"
     DEEPSEEK_CODER_V2_16B = "deepseek-coder-v2:16b"
     CODELLAMA_7B = "codellama:7b-instruct"
+    MISTRAL_7B = "mistral"
 
 
 @dataclass(frozen=True)

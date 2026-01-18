@@ -11,7 +11,7 @@ Only exec_result summary is provided.
 from langgraph.graph import StateGraph, START, END
 
 from src.core.state import AgentState
-from src.core.multi_agent.agents.planner import plan_task
+from core.multi_agent.agents.planner.agent import plan_task
 from src.core.multi_agent.agents.coder import generate_code
 from src.core.multi_agent.agents.critic import critique
 
