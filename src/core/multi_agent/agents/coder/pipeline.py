@@ -18,7 +18,9 @@ Flow:
 from langgraph.graph import StateGraph, START, END
 from src.core.multi_agent.agents.coder.state import CoderAgentState
 from src.core.multi_agent.agents.coder.nodes.input_validator import input_validator_node
-from src.core.multi_agent.agents.coder.nodes.edge_case_analyzer import edge_case_analyzer_node
+from src.core.multi_agent.agents.coder.nodes.edge_case_analyzer import (
+    edge_case_analyzer_node,
+)
 from src.core.multi_agent.agents.coder.nodes.cot_generator import cot_generator_node
 from src.core.multi_agent.agents.coder.nodes.code_generator import code_generator_node
 from src.core.multi_agent.agents.coder.nodes.code_validator import code_validator_node
@@ -28,12 +30,12 @@ from src.core.multi_agent.agents.coder.nodes.code_optimizer import code_optimize
 def consolidation_node(state: CoderAgentState) -> CoderAgentState:
     """
     Consolidate optimized code into final output.
-    
+
     Final step that packages code for delivery to critic agent.
     """
     # Use optimized code as final output
     state["code"] = state.get("optimized_code")
-    
+
     if state.get("show_node_info"):
         if state["code"]:
             lines = state["code"].split("\n")
@@ -46,7 +48,7 @@ def consolidation_node(state: CoderAgentState) -> CoderAgentState:
                 print(f"Errors: {len(state['errors'])}")
                 for err in state["errors"][:3]:
                     print(f"   - {err}")
-    
+
     return state
 
 
@@ -54,10 +56,11 @@ def consolidation_node(state: CoderAgentState) -> CoderAgentState:
 # GRAPH BUILDER
 # ═══════════════════════════════════════════════════════════════════════
 
+
 def build_coder_graph():
     """
     Build the multi-node coder agent graph.
-    
+
     Architecture:
     - 6 specialized code generation nodes
     - Input validation gate
@@ -65,12 +68,12 @@ def build_coder_graph():
     - Validation to ensure correctness
     - Optimization for final polish
     - Consolidation for final output
-    
+
     Returns:
         Compiled LangGraph
     """
     graph = StateGraph(CoderAgentState)
-    
+
     # Add all nodes
     graph.add_node("input_validator", input_validator_node)
     graph.add_node("edge_case_analyzer", edge_case_analyzer_node)
@@ -79,7 +82,7 @@ def build_coder_graph():
     graph.add_node("code_validator", code_validator_node)
     graph.add_node("code_optimizer", code_optimizer_node)
     graph.add_node("consolidation", consolidation_node)
-    
+
     # Define flow - linear pipeline
     graph.add_edge(START, "input_validator")
     graph.add_edge("input_validator", "edge_case_analyzer")
@@ -89,5 +92,5 @@ def build_coder_graph():
     graph.add_edge("code_validator", "code_optimizer")
     graph.add_edge("code_optimizer", "consolidation")
     graph.add_edge("consolidation", END)
-    
+
     return graph.compile()

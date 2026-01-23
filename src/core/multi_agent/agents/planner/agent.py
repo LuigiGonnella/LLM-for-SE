@@ -13,7 +13,7 @@ import json
 class PlannerAgent:
     """
     High-level interface for the SOTA multi-node planner agent.
-    
+
     Usage:
         planner = PlannerAgent(model="llama3.1:70b")
         plan = planner.create_plan(
@@ -21,23 +21,23 @@ class PlannerAgent:
             user_request="Create a function that validates email addresses",
             verbose=True
         )
-        
+
         if plan["approved"]:
             print("Plan approved! Ready for coder agent.")
         else:
             print("Best-effort plan created.")
     """
-    
+
     def __init__(self, model: str = "mistral"):
         """
         Initialize the planner agent.
-        
+
         Args:
             model: Ollama model to use for planning
         """
         self.model = model
         self.graph = build_planner_graph()
-    
+
     def create_plan(
         self,
         task_id: str,
@@ -46,12 +46,12 @@ class PlannerAgent:
     ) -> Dict[str, Any]:
         """
         Create a comprehensive implementation plan from a user request.
-        
+
         Args:
             task_id: Unique identifier for this task
             user_request: The user's request/task description
             verbose: Whether to show detailed node outputs
-        
+
         Returns:
             Dict containing the final plan with keys:
                 - intent: Intent analysis
@@ -61,7 +61,7 @@ class PlannerAgent:
                 - quality_review: Quality assessment
                 - approved: Boolean indicating plan approval
                 - iterations: Number of refinement iterations
-        
+
         Raises:
             RuntimeError: If planning fails critically
             ConnectionError: If cannot connect to Ollama
@@ -81,32 +81,32 @@ class PlannerAgent:
             "iteration_count": 0,
             "errors": [],
         }
-        
+
         try:
             result = self.graph.invoke(initial_state)
             return result.get("final_plan", {})
-        
+
         except Exception as e:
             raise RuntimeError(f"Planning failed: {str(e)}") from e
-    
+
     def export_plan_json(self, plan: Dict[str, Any], filepath: str) -> None:
         """
         Export plan to JSON file.
-        
+
         Args:
             plan: The plan dict returned from create_plan()
             filepath: Path where to save the JSON file
         """
-        with open(filepath, 'w', encoding='utf-8') as f:
+        with open(filepath, "w", encoding="utf-8") as f:
             json.dump(plan, f, indent=2, ensure_ascii=False)
-    
+
     def get_plan_summary(self, plan: Dict[str, Any]) -> str:
         """
         Get a human-readable summary of the plan.
-        
+
         Args:
             plan: The plan dict returned from create_plan()
-        
+
         Returns:
             Formatted string summary
         """
@@ -115,7 +115,7 @@ class PlannerAgent:
         architecture = plan.get("architecture", {})
         implementation = plan.get("implementation", {})
         quality = plan.get("quality_review", {})
-        
+
         summary = f"""
 ╔══════════════════════════════════════════════════════════════════╗
 ║                      PLAN SUMMARY                                ║
@@ -158,6 +158,7 @@ class PlannerAgent:
 # CONVENIENCE FUNCTIONS
 # ═══════════════════════════════════════════════════════════════════════
 
+
 def plan_task(
     user_request: str,
     task_id: Optional[str] = None,
@@ -166,21 +167,21 @@ def plan_task(
 ) -> Dict[str, Any]:
     """
     Convenience function to quickly create a plan.
-    
+
     Args:
         user_request: The task description
         task_id: Optional task ID (auto-generated if not provided)
         model: Ollama model to use
         verbose: Whether to show node outputs
-    
+
     Returns:
         Complete plan dictionary
     """
     import uuid
-    
+
     if task_id is None:
         task_id = f"task_{uuid.uuid4().hex[:8]}"
-    
+
     planner = PlannerAgent(model=model)
     return planner.create_plan(
         task_id=task_id,
@@ -195,20 +196,14 @@ def plan_and_summarize(
 ) -> str:
     """
     Create a plan and return a formatted summary.
-    
+
     Args:
         user_request: The task description
         model: Ollama model to use
-    
+
     Returns:
         Human-readable summary string
     """
     plan = plan_task(user_request, model=model, verbose=False)
     planner = PlannerAgent(model=model)
     return planner.get_plan_summary(plan)
-
-
-
-
-
-

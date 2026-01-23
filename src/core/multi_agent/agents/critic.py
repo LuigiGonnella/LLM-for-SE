@@ -50,8 +50,16 @@ def make_critic_prompt(
     exec_summary: str | None,
     quality_metrics: dict | None,
 ) -> str:
-    exec_block = f"\nEXECUTION FEEDBACK (SUMMARY):\n{exec_summary}\n" if exec_summary else "\nEXECUTION FEEDBACK (SUMMARY):\nNo execution data available.\n"
-    qm_block = f"\nQUALITY METRICS:\n{quality_metrics}\n" if quality_metrics else "\nQUALITY METRICS:\nNo metrics available.\n"
+    exec_block = (
+        f"\nEXECUTION FEEDBACK (SUMMARY):\n{exec_summary}\n"
+        if exec_summary
+        else "\nEXECUTION FEEDBACK (SUMMARY):\nNo execution data available.\n"
+    )
+    qm_block = (
+        f"\nQUALITY METRICS:\n{quality_metrics}\n"
+        if quality_metrics
+        else "\nQUALITY METRICS:\nNo metrics available.\n"
+    )
 
     return f"""
 You are reviewing a generated Python solution. Analyze it deeply.
@@ -147,7 +155,9 @@ def critique(
     exec_summary: str | None = None,
     quality_metrics: dict | None = None,
 ) -> str:
-    user_prompt = make_critic_prompt(signature, docstring, plan, code, exec_summary, quality_metrics)
+    user_prompt = make_critic_prompt(
+        signature, docstring, plan, code, exec_summary, quality_metrics
+    )
     return call_llm(
         system_prompt=CRITIC_SYSTEM_PROMPT,
         user_prompt=user_prompt,

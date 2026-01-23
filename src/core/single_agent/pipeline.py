@@ -2,7 +2,10 @@ from langgraph.graph import StateGraph, START, END
 from src.core.state import AgentState
 from src.tools.executor import execute_code
 from src.utils.code_parser import extract_python_code
-from src.evaluation.quality_metrics import compute_quality_metrics, format_metrics_report
+from src.evaluation.quality_metrics import (
+    compute_quality_metrics,
+    format_metrics_report,
+)
 from src.core.single_agent.agent import (
     analyze_task,
     plan_solution,

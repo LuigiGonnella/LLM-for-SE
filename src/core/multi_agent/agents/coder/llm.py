@@ -1,4 +1,3 @@
-
 from src.core.llm import call_llm
 
 
@@ -60,7 +59,10 @@ CRITICAL RULES (NON-NEGOTIABLE):
 - Handle all edge cases mentioned in the plan
 """
 
-CODE_GENERATOR_PROMPT = BASE_SYSTEM_PROMPT + CODE_GENERATOR_SPECIFIC + """
+CODE_GENERATOR_PROMPT = (
+    BASE_SYSTEM_PROMPT
+    + CODE_GENERATOR_SPECIFIC
+    + """
 
 ═══════════════════════════════════════════════════════════════════════
 FEW-SHOT EXAMPLES
@@ -139,6 +141,7 @@ def reverse_string(s: str) -> str:
 
 ═══════════════════════════════════════════════════════════════════════
 """
+)
 
 
 EDGE_CASE_ANALYZER_PROMPT = """You are an expert at identifying edge cases and boundary conditions in programming problems.
@@ -222,13 +225,13 @@ def analyze_edge_cases(
 ) -> str:
     """
     Analyze function signature and plan to identify edge cases.
-    
+
     Args:
         signature: Function signature
         plan: Implementation plan
         type_hints: Extracted type hints from signature
         model: LLM model to use
-        
+
     Returns:
         String with newline-separated edge cases
     """
@@ -243,8 +246,10 @@ TYPE HINTS FOUND:
 
 Identify all edge cases and boundary conditions for this function.
 """
-    
-    return call_llm(user_prompt=prompt, system_prompt=EDGE_CASE_ANALYZER_PROMPT, model=model)
+
+    return call_llm(
+        user_prompt=prompt, system_prompt=EDGE_CASE_ANALYZER_PROMPT, model=model
+    )
 
 
 COT_GENERATOR_PROMPT = """You are an expert at breaking down programming problems into structured, step-by-step reasoning.
@@ -358,7 +363,7 @@ def generate_chain_of_thought(
 ) -> str:
     """
     Generate chain-of-thought reasoning for code generation.
-    
+
     Args:
         signature: Function signature
         plan: Implementation plan
@@ -366,12 +371,14 @@ def generate_chain_of_thought(
         model: LLM model to use
         critic_feedback: Optional feedback from critic agent
         exec_summary: Optional execution summary
-        
+
     Returns:
         String with structured chain-of-thought reasoning
     """
-    edge_cases_text = "\n".join(edge_cases) if edge_cases else "No specific edge cases identified"
-    
+    edge_cases_text = (
+        "\n".join(edge_cases) if edge_cases else "No specific edge cases identified"
+    )
+
     prompt = f"""FUNCTION SIGNATURE:
 {signature}
 
@@ -381,15 +388,15 @@ IMPLEMENTATION PLAN:
 EDGE CASES TO HANDLE:
 {edge_cases_text}
 """
-    
+
     if critic_feedback:
         prompt += f"\nPREVIOUS FEEDBACK:\n{critic_feedback}\n"
-    
+
     if exec_summary:
         prompt += f"\nEXECUTION SUMMARY:\n{exec_summary}\n"
-    
+
     prompt += "\nCreate detailed step-by-step reasoning for implementing this function."
-    
+
     return call_llm(user_prompt=prompt, system_prompt=COT_GENERATOR_PROMPT, model=model)
 
 
@@ -405,9 +412,9 @@ def generate_code(
 ) -> str:
     """
     Generate code based on the implementation plan and chain-of-thought reasoning.
-    
+
     Can incorporate feedback from critic and execution summary if available.
-    
+
     Args:
         signature: Function signature
         plan: Implementation plan
@@ -416,7 +423,7 @@ def generate_code(
         model: LLM model to use
         critic_feedback: Optional feedback from critic agent
         exec_summary: Optional execution summary from failures
-        
+
     Returns:
         String containing Python code
     """
@@ -426,22 +433,16 @@ def generate_code(
         "IMPLEMENTATION PLAN:\n"
         f"{plan}\n\n"
     )
-    
+
     # Include chain-of-thought reasoning
     if cot_reasoning:
-        prompt += (
-            "CHAIN-OF-THOUGHT REASONING:\n"
-            f"{cot_reasoning}\n\n"
-        )
-    
+        prompt += "CHAIN-OF-THOUGHT REASONING:\n" f"{cot_reasoning}\n\n"
+
     # Include edge cases
     if edge_cases:
         edge_cases_text = "\n".join(edge_cases)
-        prompt += (
-            "EDGE CASES TO HANDLE:\n"
-            f"{edge_cases_text}\n\n"
-        )
-    
+        prompt += "EDGE CASES TO HANDLE:\n" f"{edge_cases_text}\n\n"
+
     # Include critic feedback
     if critic_feedback:
         prompt += (
@@ -464,8 +465,10 @@ def generate_code(
         "- The output must contain exactly one function\n"
         "- No text before or after the code\n"
     )
-    
-    return call_llm(user_prompt=prompt, system_prompt=CODE_GENERATOR_PROMPT, model=model)
+
+    return call_llm(
+        user_prompt=prompt, system_prompt=CODE_GENERATOR_PROMPT, model=model
+    )
 
 
 CODE_OPTIMIZER_PROMPT = """You are an expert Python code optimizer and refactorer.
@@ -596,19 +599,19 @@ def optimize_code(
 ) -> str:
     """
     Optimize generated code for readability and performance.
-    
+
     Args:
         code: Code to optimize
         signature: Function signature (to ensure preservation)
         plan: Implementation plan (context for optimization)
         edge_cases: Edge cases being handled
         model: LLM model to use
-        
+
     Returns:
         String containing optimized Python code
     """
     edge_cases_text = "\n".join(edge_cases) if edge_cases else "No specific edge cases"
-    
+
     prompt = f"""ORIGINAL FUNCTION SIGNATURE:
 {signature}
 
@@ -624,6 +627,7 @@ EDGE CASES BEING HANDLED:
 Optimize this code for readability, clarity, and Pythonic style.
 Return ONLY the optimized code, nothing else.
 """
-    
-    return call_llm(user_prompt=prompt, system_prompt=CODE_OPTIMIZER_PROMPT, model=model)
 
+    return call_llm(
+        user_prompt=prompt, system_prompt=CODE_OPTIMIZER_PROMPT, model=model
+    )

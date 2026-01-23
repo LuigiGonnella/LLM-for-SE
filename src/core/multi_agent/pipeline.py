@@ -15,7 +15,9 @@ from core.multi_agent.agents.planner.agent import plan_task
 from src.core.multi_agent.agents.coder import generate_code
 from src.core.multi_agent.agents.critic import critique
 
-from src.tools.executor import run_tests  # adjust if your executor function name differs
+from src.tools.executor import (
+    run_tests,
+)  # adjust if your executor function name differs
 from src.evaluation.quality_metrics import compute_quality_metrics  # adjust if differs
 
 
@@ -55,7 +57,9 @@ def eval_node(state: AgentState) -> AgentState:
     # NOTE: test_file should be provided by the runner, but never shown to agents
     test_file = state.get("test_file")
     if not test_file:
-        raise ValueError("State missing 'test_file' for evaluation (executor needs it).")
+        raise ValueError(
+            "State missing 'test_file' for evaluation (executor needs it)."
+        )
 
     # Functional correctness
     exec_result = run_tests(code=state["code"], test_file=str(test_file))

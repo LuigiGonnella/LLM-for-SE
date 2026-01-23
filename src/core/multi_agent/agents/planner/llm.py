@@ -18,21 +18,25 @@ from src.utils.config import config
 # MODEL-SPECIFIC PROFILES
 # ═══════════════════════════════════════════════════════════════════════
 
+
 def get_model_profile(model: str) -> Dict[str, Any]:
     """
     Get optimized settings based on model size.
     Automatically adapts to 7B, 13B, 70B+ models.
-    
+
     Args:
         model: Model identifier (e.g., "mistral:7b", "llama3.1:70b")
-        
+
     Returns:
         Dict with optimal settings for that model class
     """
     model_lower = model.lower()
-    
+
     # Detect model size
-    if any(size in model_lower for size in ["7b", "8b"]) or model_lower in ["mistral", "mistral:latest"]:
+    if any(size in model_lower for size in ["7b", "8b"]) or model_lower in [
+        "mistral",
+        "mistral:latest",
+    ]:
         # Small models (7B-8B) - Mistral 7B optimization
         # Note: 'mistral' defaults to 7B variant
         return {
@@ -105,45 +109,48 @@ def compress_phase_output(phase_name: str, phase_data: Dict[str, Any]) -> str:
     """
     Compress phase output to essential information only.
     Critical for maintaining context window on 7B models.
-    
+
     Args:
         phase_name: Name of the phase
         phase_data: Full JSON output from phase
-        
+
     Returns:
         Compressed string summary (max ~200 tokens)
     """
     if not phase_data or "error" in phase_data:
         return f"{phase_name}: Error or empty"
-    
+
     if phase_name == "intent_analysis":
         return f"""Intent: {phase_data.get('intent', 'N/A')}
 Type: {phase_data.get('task_type', 'N/A')}
 Domain: {phase_data.get('domain', 'N/A')}"""
-    
+
     elif phase_name == "requirements":
-        func_count = len(phase_data.get('functional', []))
-        edge_count = len(phase_data.get('edge_cases', []))
-        perf = phase_data.get('non_functional', {}).get('performance', {})
+        func_count = len(phase_data.get("functional", []))
+        edge_count = len(phase_data.get("edge_cases", []))
+        perf = phase_data.get("non_functional", {}).get("performance", {})
         return f"""Requirements: {func_count} functional reqs
 Complexity: {perf.get('time_complexity', 'N/A')}
 Edge cases: {edge_count} identified"""
-    
+
     elif phase_name == "architecture":
-        components = phase_data.get('components', [])
-        comp_names = [c.get('name', 'unknown') for c in components[:3]]
+        components = phase_data.get("components", [])
+        comp_names = [c.get("name", "unknown") for c in components[:3]]
         return f"""Components: {', '.join(comp_names)}
 Total: {len(components)} components
 Patterns: {components[0].get('design_pattern', 'N/A')[:50] if components else 'N/A'}"""
-    
+
     elif phase_name == "implementation":
-        comp_count = len(phase_data.get('components', []))
-        total_steps = sum(len(c.get('steps', [])) for c in phase_data.get('components', []))
+        comp_count = len(phase_data.get("components", []))
+        total_steps = sum(
+            len(c.get("steps", [])) for c in phase_data.get("components", [])
+        )
         return f"""Implementation: {comp_count} components
 Total steps: {total_steps}
 Order: {', '.join(phase_data.get('implementation_order', [])[:3])}"""
-    
+
     return f"{phase_name}: Available"
+
 
 # ═══════════════════════════════════════════════════════════════════════
 # COMMON BASE PROMPT - Shared across ALL planning nodes
@@ -641,36 +648,37 @@ PLAN_QUALITY_REVIEWER_PROMPT = BASE_SYSTEM_PROMPT + PLAN_QUALITY_REVIEWER_SPECIF
 # JSON REPAIR UTILITY
 # ═══════════════════════════════════════════════════════════════════════
 
+
 def extract_and_parse_json(response: str, max_attempts: int = 3) -> Dict[Any, Any]:
     """
     Extract and parse JSON from LLM response with automatic repair.
-    
+
     Handles common issues:
     - JSON wrapped in <output> tags (chain-of-thought)
     - Markdown code blocks
     - Trailing commas
     - Missing quotes
     - Extra text before/after JSON
-    
+
     Args:
         response: Raw LLM response
         max_attempts: Number of repair strategies to try
-        
+
     Returns:
         Parsed JSON dict
-        
+
     Raises:
         json.JSONDecodeError: If all repair attempts fail
     """
     attempts = [
         # Attempt 1: Extract from <output> tags
-        lambda r: re.search(r'<output>\s*(.+?)\s*</output>', r, re.DOTALL),
+        lambda r: re.search(r"<output>\s*(.+?)\s*</output>", r, re.DOTALL),
         # Attempt 2: Extract from ```json blocks
-        lambda r: re.search(r'```(?:json)?\s*(.+?)\s*```', r, re.DOTALL),
+        lambda r: re.search(r"```(?:json)?\s*(.+?)\s*```", r, re.DOTALL),
         # Attempt 3: Find first { to last }
-        lambda r: re.search(r'\{.+\}', r, re.DOTALL),
+        lambda r: re.search(r"\{.+\}", r, re.DOTALL),
     ]
-    
+
     for i, extract_func in enumerate(attempts[:max_attempts]):
         try:
             # Try to extract JSON
@@ -679,29 +687,30 @@ def extract_and_parse_json(response: str, max_attempts: int = 3) -> Dict[Any, An
                 json_str = match.group(1) if i < 2 else match.group(0)
             else:
                 json_str = response  # Use raw response
-            
+
             # Clean common issues
             json_str = json_str.strip()
             # Remove trailing commas before } or ]
-            json_str = re.sub(r',\s*([}\]])', r'\1', json_str)
-            
+            json_str = re.sub(r",\s*([}\]])", r"\1", json_str)
+
             # Try to parse
             return json.loads(json_str)
-            
+
         except (json.JSONDecodeError, AttributeError):
             continue
-    
+
     # All attempts failed
     raise json.JSONDecodeError(
         f"Failed to parse JSON after {max_attempts} attempts. Response: {response[:200]}...",
         response,
-        0
+        0,
     )
 
 
 # ═══════════════════════════════════════════════════════════════════════
 # LLM CALL FUNCTION
 # ═══════════════════════════════════════════════════════════════════════
+
 
 def call_llm(
     *,
@@ -715,7 +724,7 @@ def call_llm(
     """
     Core LLM call for all planner nodes.
     Automatically adapts to model size using profiles.
-    
+
     Args:
         user_prompt: The specific task/question for this node (DATA ONLY)
         system_prompt: The node-specific system prompt (INSTRUCTIONS)
@@ -723,27 +732,27 @@ def call_llm(
         temperature: Sampling temperature (None = use profile default)
         max_tokens: Maximum response tokens (None = use profile default)
         node_name: Node identifier for profile optimization
-    
+
     Returns:
         str: LLM response (typically JSON in <output> tags)
-    
+
     Raises:
         RuntimeError: After all retry attempts exhausted
         ConnectionError: Cannot connect to Ollama
     """
     # Get model-specific profile
     profile = get_model_profile(model)
-    
+
     # Use profile defaults if not specified
     if temperature is None:
         temperature = profile["temperature"].get(node_name, 0.2)
     if max_tokens is None:
         max_tokens = profile["max_tokens"].get(node_name, 1536)
-    
+
     base_delay = 0.5
     max_delay = 8.0
     last_exception = None
-    
+
     for attempt in range(config.max_retries + 1):
         try:
             response = ollama.chat(
@@ -763,38 +772,39 @@ def call_llm(
                     "num_ctx": 8192,
                 },
             )
-            
+
             content = response.get("message", {}).get("content", "")
             if not content or len(content.strip()) < 10:
                 raise ValueError(f"Empty response (attempt {attempt + 1})")
-            
+
             return content
-        
+
         except ollama.ResponseError as e:
             last_exception = e
             if attempt == config.max_retries:
                 raise RuntimeError(
                     f"LLM API error after {config.max_retries + 1} attempts: {str(e)}"
                 ) from e
-        
+
         except ollama.RequestError as e:
             last_exception = e
             if attempt == config.max_retries:
                 raise ConnectionError(
                     f"Cannot connect to Ollama. Ensure 'ollama serve' is running: {str(e)}"
                 ) from e
-        
+
         except Exception as e:
             last_exception = e
             if attempt == config.max_retries:
                 raise RuntimeError(
                     f"Unexpected error after {config.max_retries + 1} attempts: {str(e)}"
                 ) from e
-        
+
         if attempt < config.max_retries:
-            delay = min(base_delay * (2 ** attempt), max_delay)
+            delay = min(base_delay * (2**attempt), max_delay)
             print(f"⏳ Retry {attempt + 1} in {delay:.1f}s...")
             time.sleep(delay)
-    
-    raise RuntimeError(f"Failed after {config.max_retries + 1} attempts: {str(last_exception)}")
 
+    raise RuntimeError(
+        f"Failed after {config.max_retries + 1} attempts: {str(last_exception)}"
+    )

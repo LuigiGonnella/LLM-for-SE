@@ -27,7 +27,9 @@ def main():
             "iteration": 0,
             "max_iterations": 2,
             "model": "qwen2.5-coder:7b-instruct",
-            "test_file": str(test_file),  # executor only; agents never see file contents
+            "test_file": str(
+                test_file
+            ),  # executor only; agents never see file contents
         }
 
         final_state = graph.invoke(state)
