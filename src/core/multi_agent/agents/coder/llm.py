@@ -32,117 +32,10 @@ ERROR HANDLING MINDSET:
 NOTE: You are implementing code ONLY. Testing and review happen in other agents.
 """
 
-CODE_GENERATOR_SPECIFIC = """
-YOUR ROLE: Expert Python engineer implementing production code from detailed plans.
 
-YOUR TASK: Generate complete, correct Python code following the implementation plan.
-
-IMPLEMENTATION CHECKLIST:
-1. SIGNATURE COMPLIANCE: Match function signature exactly
-2. PLAN ADHERENCE: Follow all steps from the implementation plan
-3. EDGE CASE HANDLING: Implement all identified edge cases
-4. CONSTRAINT RESPECT: Honor all constraints and assumptions
-5. CODE QUALITY: Write clean, readable, maintainable code
-
-ANTI-PATTERNS TO AVOID:
-- DON'T change the function signature
-- DON'T add helper functions unless explicitly in the plan
-- DON'T include unnecessary imports
-- DON'T add print statements or logging
-- DON'T include docstrings or comments
-- DON'T write multiple functions
-
-CRITICAL RULES (NON-NEGOTIABLE):
-- Output ONLY Python code, nothing else
-- The code must be executable without modifications
-- Start with 'def' and include complete implementation
-- Handle all edge cases mentioned in the plan
-"""
-
-CODE_GENERATOR_PROMPT = (
-    BASE_SYSTEM_PROMPT
-    + CODE_GENERATOR_SPECIFIC
-    + """
-
-═══════════════════════════════════════════════════════════════════════
-FEW-SHOT EXAMPLES
-═══════════════════════════════════════════════════════════════════════
-
-EXAMPLE 1: Simple List Sum
-─────────────────────────────────────────────────────────────────────
-
-FUNCTION SIGNATURE:
-def sum_list(numbers: list[int]) -> int:
-
-IMPLEMENTATION PLAN:
-Iterate through the list and accumulate sum. Handle empty list by returning 0.
-Edge cases: empty list, single element, negative numbers.
-
-EDGE CASES:
-- Empty list → return 0
-- Single element → return that element
-- Negative numbers → add them correctly
-- Large numbers → handle integer sum
-
-EXPECTED OUTPUT:
-def sum_list(numbers: list[int]) -> int:
-    total = 0
-    for num in numbers:
-        total += num
-    return total
-
-─────────────────────────────────────────────────────────────────────
-
-EXAMPLE 2: Array with Filtering
-─────────────────────────────────────────────────────────────────────
-
-FUNCTION SIGNATURE:
-def filter_even(arr: list[int]) -> list[int]:
-
-IMPLEMENTATION PLAN:
-Filter the array to keep only even numbers. Return new list with even elements.
-Edge cases: empty array, all odd, all even, negative even numbers.
-
-EDGE CASES:
-- Empty array → return []
-- All odd numbers → return []
-- All even numbers → return copy of array
-- Negative even numbers (-2, -4) → include them
-
-EXPECTED OUTPUT:
-def filter_even(arr: list[int]) -> list[int]:
-    result = []
-    for num in arr:
-        if num % 2 == 0:
-            result.append(num)
-    return result
-
-─────────────────────────────────────────────────────────────────────
-
-EXAMPLE 3: String Reversal with Conditions
-─────────────────────────────────────────────────────────────────────
-
-FUNCTION SIGNATURE:
-def reverse_string(s: str) -> str:
-
-IMPLEMENTATION PLAN:
-Reverse the string while preserving case and handling special characters.
-Edge cases: empty string, single char, special characters, unicode.
-
-EDGE CASES:
-- Empty string → return ""
-- Single character → return same char
-- Special characters → reverse them as well
-- Unicode characters → handle correctly
-
-EXPECTED OUTPUT:
-def reverse_string(s: str) -> str:
-    return s[::-1]
-
-═══════════════════════════════════════════════════════════════════════
-"""
-)
-
+# ═══════════════════════════════════════════════════════════════════════
+# EDGE CASE ANALYZER
+# ═══════════════════════════════════════════════════════════════════════
 
 EDGE_CASE_ANALYZER_PROMPT = """You are an expert at identifying edge cases and boundary conditions in programming problems.
 
@@ -251,6 +144,10 @@ Identify all edge cases and boundary conditions for this function.
         user_prompt=prompt, system_prompt=EDGE_CASE_ANALYZER_PROMPT, model=model
     )
 
+
+# ═══════════════════════════════════════════════════════════════════════
+# CHAIN-OF-THOUGHT GENERATOR
+# ═══════════════════════════════════════════════════════════════════════
 
 COT_GENERATOR_PROMPT = """You are an expert at breaking down programming problems into structured, step-by-step reasoning.
 
@@ -400,6 +297,121 @@ EDGE CASES TO HANDLE:
     return call_llm(user_prompt=prompt, system_prompt=COT_GENERATOR_PROMPT, model=model)
 
 
+# ═══════════════════════════════════════════════════════════════════════
+# CODE GENERATOR
+# ═══════════════════════════════════════════════════════════════════════
+
+CODE_GENERATOR_SPECIFIC = """
+YOUR ROLE: Expert Python engineer implementing production code from detailed plans.
+
+YOUR TASK: Generate complete, correct Python code following the implementation plan.
+
+IMPLEMENTATION CHECKLIST:
+1. SIGNATURE COMPLIANCE: Match function signature exactly
+2. PLAN ADHERENCE: Follow all steps from the implementation plan
+3. EDGE CASE HANDLING: Implement all identified edge cases
+4. CONSTRAINT RESPECT: Honor all constraints and assumptions
+5. CODE QUALITY: Write clean, readable, maintainable code
+
+ANTI-PATTERNS TO AVOID:
+- DON'T change the function signature
+- DON'T add helper functions unless explicitly in the plan
+- DON'T include unnecessary imports
+- DON'T add print statements or logging
+- DON'T include docstrings or comments
+- DON'T write multiple functions
+
+CRITICAL RULES (NON-NEGOTIABLE):
+- Output ONLY Python code, nothing else
+- The code must be executable without modifications
+- Start with 'def' and include complete implementation
+- Handle all edge cases mentioned in the plan
+"""
+
+CODE_GENERATOR_PROMPT = (
+    BASE_SYSTEM_PROMPT
+    + CODE_GENERATOR_SPECIFIC
+    + """
+
+═══════════════════════════════════════════════════════════════════════
+FEW-SHOT EXAMPLES
+═══════════════════════════════════════════════════════════════════════
+
+EXAMPLE 1: Simple List Sum
+─────────────────────────────────────────────────────────────────────
+
+FUNCTION SIGNATURE:
+def sum_list(numbers: list[int]) -> int:
+
+IMPLEMENTATION PLAN:
+Iterate through the list and accumulate sum. Handle empty list by returning 0.
+Edge cases: empty list, single element, negative numbers.
+
+EDGE CASES:
+- Empty list → return 0
+- Single element → return that element
+- Negative numbers → add them correctly
+- Large numbers → handle integer sum
+
+EXPECTED OUTPUT:
+def sum_list(numbers: list[int]) -> int:
+    total = 0
+    for num in numbers:
+        total += num
+    return total
+
+─────────────────────────────────────────────────────────────────────
+
+EXAMPLE 2: Array with Filtering
+─────────────────────────────────────────────────────────────────────
+
+FUNCTION SIGNATURE:
+def filter_even(arr: list[int]) -> list[int]:
+
+IMPLEMENTATION PLAN:
+Filter the array to keep only even numbers. Return new list with even elements.
+Edge cases: empty array, all odd, all even, negative even numbers.
+
+EDGE CASES:
+- Empty array → return []
+- All odd numbers → return []
+- All even numbers → return copy of array
+- Negative even numbers (-2, -4) → include them
+
+EXPECTED OUTPUT:
+def filter_even(arr: list[int]) -> list[int]:
+    result = []
+    for num in arr:
+        if num % 2 == 0:
+            result.append(num)
+    return result
+
+─────────────────────────────────────────────────────────────────────
+
+EXAMPLE 3: String Reversal with Conditions
+─────────────────────────────────────────────────────────────────────
+
+FUNCTION SIGNATURE:
+def reverse_string(s: str) -> str:
+
+IMPLEMENTATION PLAN:
+Reverse the string while preserving case and handling special characters.
+Edge cases: empty string, single char, special characters, unicode.
+
+EDGE CASES:
+- Empty string → return ""
+- Single character → return same char
+- Special characters → reverse them as well
+- Unicode characters → handle correctly
+
+EXPECTED OUTPUT:
+def reverse_string(s: str) -> str:
+    return s[::-1]
+
+═══════════════════════════════════════════════════════════════════════
+"""
+)
+
 def generate_code(
     *,
     signature: str,
@@ -470,6 +482,10 @@ def generate_code(
         user_prompt=prompt, system_prompt=CODE_GENERATOR_PROMPT, model=model
     )
 
+
+# ═══════════════════════════════════════════════════════════════════════
+# CODE OPTIMIZER
+# ═══════════════════════════════════════════════════════════════════════
 
 CODE_OPTIMIZER_PROMPT = """You are an expert Python code optimizer and refactorer.
 

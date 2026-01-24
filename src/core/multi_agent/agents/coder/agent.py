@@ -55,19 +55,13 @@ class CoderAgent:
             "critic_feedback": critic_feedback,
             "exec_summary": exec_summary,
             "errors": [],
-            # Input validation phase
             "input_validation_errors": [],
             "should_proceed": True,
-            # Edge case analysis phase
             "edge_cases": [],
-            # CoT generation phase
             "cot_reasoning": "",
-            # Code generation phase
             "raw_code": None,
-            # Code validation phase
             "validated_code": None,
             "validation_errors": [],
-            # Code optimization phase
             "optimized_code": None,
             "optimization_suggestions": [],
         }
