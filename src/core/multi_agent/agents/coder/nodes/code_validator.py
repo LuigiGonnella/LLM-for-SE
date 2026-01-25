@@ -83,7 +83,7 @@ def code_validator_node(state: CoderAgentState) -> CoderAgentState:
         Updated state with validation results
     """
 
-    print("\n  - PHASE 6: CODE VALIDATION")
+    print("\n  - PHASE 5: CODE VALIDATION")
 
     # Skip if no code was generated
     if not state.get("raw_code"):
