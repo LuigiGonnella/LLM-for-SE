@@ -4,6 +4,7 @@ Code Optimizer Node - Optimizes code for readability and performance.
 
 from src.core.multi_agent.agents.coder.state import CoderAgentState
 from src.core.multi_agent.agents.coder.llm import optimize_code
+from src.utils.code_parser import extract_python_code
 
 
 def code_optimizer_node(state: CoderAgentState) -> CoderAgentState:
@@ -37,14 +38,18 @@ def code_optimizer_node(state: CoderAgentState) -> CoderAgentState:
     
     try:
         # Use LLM to optimize code
-        optimized_code = optimize_code(
+        raw_optimized = optimize_code(
             code=state["validated_code"],
             signature=state.get("signature"),
             plan=state.get("plan"),
             edge_cases=state.get("edge_cases", []),
             model=state.get("model"),
         )
-        
+
+        optimized_code = extract_python_code(raw_optimized)
+        if not optimized_code:
+            raise ValueError("Failed to extract valid Python code from optimizer output")
+
         state["optimized_code"] = optimized_code
         
         if state.get("show_node_info"):
