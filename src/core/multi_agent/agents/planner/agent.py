@@ -116,40 +116,36 @@ class PlannerAgent:
         implementation = plan.get("implementation", {})
         quality = plan.get("quality_review", {})
 
-        summary = f"""
-╔══════════════════════════════════════════════════════════════════╗
-║                      PLAN SUMMARY                                ║
-╚══════════════════════════════════════════════════════════════════╝
+        summary = f"""PLAN SUMMARY
 
-📋 TASK: {plan.get('task_id', 'N/A')}
+TASK: {plan.get('task_id', 'N/A')}
 
-🎯 INTENT
+INTENT
    Problem: {intent.get('intent', 'N/A')}
    Type: {intent.get('task_type', 'N/A')}
    Domain: {intent.get('domain', 'N/A')}
 
-📝 REQUIREMENTS
+REQUIREMENTS
    Functional: {len(requirements.get('functional', []))} requirements
    Performance: {requirements.get('non_functional', {}).get('performance', {}).get('time_complexity', 'N/A')}
    Edge Cases: {len(requirements.get('edge_cases', []))} identified
 
-🏗️ ARCHITECTURE
+ARCHITECTURE
    Components: {len(architecture.get('components', []))}
    Design Patterns: {len(architecture.get('exception_hierarchy', []))} exception types
 
-⚙️ IMPLEMENTATION
+IMPLEMENTATION
    Steps: {sum(len(c.get('steps', [])) for c in implementation.get('components', []))}
    Test Cases: {sum(len(c.get('test_cases', [])) for c in implementation.get('components', []))}
 
-🔍 QUALITY
+QUALITY
    Score: {quality.get('completeness_score', 0)}/10
    Issues: {len(quality.get('issues', []))}
    Status: {'✅ APPROVED' if plan.get('approved') else '⚠️ NEEDS WORK'}
-   
-🔄 ITERATIONS: {plan.get('iterations', 0)}
 
-{'✅ This plan is production-ready!' if plan.get('approved') else '⚠️ This is a best-effort plan.'}
-╚══════════════════════════════════════════════════════════════════╝
+ITERATIONS: {plan.get('iterations', 0)}
+
+{'This plan is production-ready!' if plan.get('approved') else 'This is a best-effort plan.'}
 """
         return summary
 
