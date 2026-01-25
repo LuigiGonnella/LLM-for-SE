@@ -31,21 +31,23 @@ def consolidation_node(state: CoderAgentState) -> CoderAgentState:
 
     Final step that packages code for delivery to critic agent.
     """
+    print("\n  - PHASE 7: CODE CONSOLIDATION")
+
     # Use optimized code as final output
     state["code"] = state.get("optimized_code")
 
     if state.get("show_node_info"):
         if state["code"]:
             lines = state["code"].split("\n")
-            print("\nCode generation complete")
-            print(f"Lines: {len(lines)}")
-            print("Status: Ready for critic review")
+            print("    Code generation complete")
+            print(f"    Lines: {len(lines)}")
+            print("    Status: Ready for critic review")
         else:
-            print("\nNo code generated")
+            print("    No code generated")
             if state.get("errors"):
-                print(f"Errors: {len(state['errors'])}")
+                print(f"    Errors: {len(state['errors'])}")
                 for err in state["errors"][:3]:
-                    print(f"   - {err}")
+                    print(f"      - {err}")
 
     return state
 

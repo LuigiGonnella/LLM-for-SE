@@ -59,6 +59,8 @@ def edge_case_analyzer_node(state: CoderAgentState) -> CoderAgentState:
         state["edge_cases"] = []
         return state
 
+    print("\n  - PHASE 2: EDGE CASE ANALYSIS")
+
     try:
         # Extract type information from signature
         type_hints = _extract_type_hints(state.get("signature", ""))
@@ -81,11 +83,11 @@ def edge_case_analyzer_node(state: CoderAgentState) -> CoderAgentState:
         state["edge_cases"] = edge_cases
 
         if state.get("show_node_info"):
-            print(f"\nIdentified {len(edge_cases)} edge cases:")
+            print(f"    Identified {len(edge_cases)} edge cases:")
             for i, case in enumerate(edge_cases[:5], 1):
-                print(f"   {i}. {case}")
+                print(f"      - {i}. {case}")
             if len(edge_cases) > 5:
-                print(f"   ... and {len(edge_cases) - 5} more")
+                print(f"      - ... and {len(edge_cases) - 5} more")
             print()
 
     except Exception as e:
@@ -93,6 +95,6 @@ def edge_case_analyzer_node(state: CoderAgentState) -> CoderAgentState:
         state["errors"] = state.get("errors", []) + [error_msg]
         state["edge_cases"] = []
         if state.get("show_node_info"):
-            print(f" {error_msg}\n")
+            print(f"    {error_msg}\n")
 
     return state

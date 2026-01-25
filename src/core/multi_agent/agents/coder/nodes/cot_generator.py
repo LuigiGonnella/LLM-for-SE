@@ -31,6 +31,8 @@ def cot_generator_node(state: CoderAgentState) -> CoderAgentState:
         state["cot_reasoning"] = ""
         return state
 
+    print("\n  - PHASE 3: CHAIN-OF-THOUGHT GENERATION")
+
     try:
         # Generate structured chain-of-thought
         cot_text = generate_chain_of_thought(
@@ -49,7 +51,7 @@ def cot_generator_node(state: CoderAgentState) -> CoderAgentState:
             preview = "\n".join(lines[:8])
             if len(lines) > 8:
                 preview += f"\n... ({len(lines)} lines total)"
-            print(f"\nGenerated Chain-of-Thought ({len(lines)} lines):")
+            print(f"    Generated Chain-of-Thought ({len(lines)} lines):")
             print(preview)
             print()
 
@@ -58,6 +60,6 @@ def cot_generator_node(state: CoderAgentState) -> CoderAgentState:
         state["errors"] = state.get("errors", []) + [error_msg]
         state["cot_reasoning"] = ""
         if state.get("show_node_info"):
-            print(f"  {error_msg}\n")
+            print(f"    {error_msg}\n")
 
     return state

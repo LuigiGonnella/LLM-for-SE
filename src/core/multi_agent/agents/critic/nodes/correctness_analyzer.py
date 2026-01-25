@@ -8,8 +8,7 @@ def correctness_analyzer_node(state: CriticAgentState) -> CriticAgentState:
     if not state.get("should_proceed"):
         return state
 
-    if state.get("show_node_info"):
-        print("Analyzing correctness...")
+    print("\n  - PHASE 2: CORRECTNESS ANALYSIS")
 
     analysis = analyze_correctness(
         signature=state["signature"],
@@ -21,4 +20,8 @@ def correctness_analyzer_node(state: CriticAgentState) -> CriticAgentState:
     )
 
     state["correctness_analysis"] = analysis
+
+    if state.get("show_node_info"):
+        print("    Correctness analysis: ", state["correctness_analysis"])
+
     return state

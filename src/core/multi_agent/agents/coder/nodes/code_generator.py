@@ -32,6 +32,8 @@ def code_generator_node(state: CoderAgentState) -> CoderAgentState:
         state["raw_code"] = None
         return state
 
+    print("\n  - PHASE 4: CODE GENERATION")
+
     try:
         # Generate code with all context from previous phases
         raw_code = generate_code(
@@ -51,7 +53,7 @@ def code_generator_node(state: CoderAgentState) -> CoderAgentState:
             state["errors"] = state.get("errors", []) + [error_msg]
             state["raw_code"] = None
             if state.get("show_node_info"):
-                print(f"  {error_msg}\n")
+                print(f"    {error_msg}\n")
             return state
 
         state["raw_code"] = extracted
@@ -61,7 +63,7 @@ def code_generator_node(state: CoderAgentState) -> CoderAgentState:
             preview = "\n".join(lines[:5])
             if len(lines) > 5:
                 preview += f"\n... ({len(lines)} lines total)"
-            print(f"\nGenerated Code ({len(lines)} lines):")
+            print(f"    Generated Code ({len(lines)} lines):")
             print(preview)
             print()
 
@@ -70,6 +72,6 @@ def code_generator_node(state: CoderAgentState) -> CoderAgentState:
         state["errors"] = state.get("errors", []) + [error_msg]
         state["raw_code"] = None
         if state.get("show_node_info"):
-            print(f"  {error_msg}\n")
+            print(f"    {error_msg}\n")
 
     return state

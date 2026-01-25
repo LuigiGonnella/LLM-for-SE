@@ -9,6 +9,7 @@ def input_validator_node(state: CriticAgentState) -> CriticAgentState:
     - Plan presence
     - Signature presence
     """
+    print("\n  - PHASE 1: INPUT VALIDATION")
     validation_errors = []
 
     if not state.get("code"):
@@ -25,11 +26,11 @@ def input_validator_node(state: CriticAgentState) -> CriticAgentState:
 
     if state.get("show_node_info"):
         if state["should_proceed"]:
-            print("\nInput validation passed")
+            print("    Input validation passed")
         else:
-            print("\nInput validation failed:")
+            print("    Input validation failed:")
             for error in validation_errors:
-                print(f"    - {error}")
+                print(f"      - {error}")
             print()
 
     return state

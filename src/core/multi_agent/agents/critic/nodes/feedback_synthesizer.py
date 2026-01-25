@@ -7,11 +7,10 @@ def feedback_synthesizer_node(state: CriticAgentState) -> CriticAgentState:
     """
     if not state.get("should_proceed"):
         return state
+    
+    print("\n  - PHASE 4: FEEDBACK SYNTHESIS")
 
-    if state.get("show_node_info"):
-        print("Synthesizing feedback...")
 
-    # If any analysis is missing, we can't synthesize properly.
     if not state.get("correctness_analysis") or not state.get("quality_analysis"):
         state["feedback"] = "Error: Incomplete analysis."
         return state
@@ -25,6 +24,6 @@ def feedback_synthesizer_node(state: CriticAgentState) -> CriticAgentState:
     state["feedback"] = feedback
     
     if state.get("show_node_info"):
-        print("Critique generation complete.")
+        print("    Final feedback: ", state["feedback"])
 
     return state

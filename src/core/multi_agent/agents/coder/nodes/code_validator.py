@@ -83,12 +83,14 @@ def code_validator_node(state: CoderAgentState) -> CoderAgentState:
         Updated state with validation results
     """
 
+    print("\n  - PHASE 6: CODE VALIDATION")
+
     # Skip if no code was generated
     if not state.get("raw_code"):
         state["validated_code"] = None
         state["validation_errors"] = ["No code to validate"]
         if state.get("show_node_info"):
-            print("\n  No code to validate\n")
+            print("    No code to validate\n")
         return state
 
     syntax_errors = _validate_syntax(state["raw_code"])
@@ -108,20 +110,20 @@ def code_validator_node(state: CoderAgentState) -> CoderAgentState:
     if state.get("show_node_info"):
         if is_valid:
             if logic_warnings:
-                print(f"\n  Code validated with {len(logic_warnings)} warning(s):")
+                print(f"    Code validated with {len(logic_warnings)} warning(s):")
                 for warning in logic_warnings[:3]:
-                    print(f"     {warning}")
+                    print(f"      - {warning}")
                 if len(logic_warnings) > 3:
-                    print(f"     ... and {len(logic_warnings) - 3} more")
+                    print(f"      - ... and {len(logic_warnings) - 3} more")
             else:
-                print("\n  Code validated (no syntax errors)")
+                print("    Code validated (no syntax errors)")
             print()
         else:
-            print(f"\n  Syntax errors found ({len(syntax_errors)}):")
+            print(f"    Syntax errors found ({len(syntax_errors)}):")
             for error in syntax_errors[:3]:
-                print(f"     {error}")
+                print(f"      - {error}")
             if len(syntax_errors) > 3:
-                print(f"     ... and {len(syntax_errors) - 3} more")
+                print(f"      - ... and {len(syntax_errors) - 3} more")
             print()
 
     return state

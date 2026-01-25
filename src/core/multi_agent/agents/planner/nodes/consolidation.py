@@ -4,7 +4,7 @@ def consolidation_node(state: AgentState) -> AgentState:
     """
     Consolidate all planning phases into final unified plan.
     """
-    print("\n  - CONSOLIDATION: Final Plan Assembly")
+    print("\n  - PHASE 6: PLAN CONSOLIDATION")
 
     final_plan = {
         "task_id": state.get("task_id"),

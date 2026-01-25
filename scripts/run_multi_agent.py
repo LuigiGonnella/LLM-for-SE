@@ -46,9 +46,9 @@ def main():
         )
         
         if not plan_result:
-            print("Planning failed. Skipping task.")
+            print("\n  Planning failed. Skipping task.")
             continue
-        print("Plan created.\n")
+        print("\n  Plan created.")
 
         # 2. Coder
         plan_str = json.dumps(plan_result, indent=2)
@@ -72,9 +72,9 @@ def main():
             )
             
             if not coder_result["success"]:
-                print("Code generation failed.")
+                print("\n  Code generation failed.")
                 break
-            print("Code generated.")
+            print("\n  Code generated.")
                 
             current_code = coder_result["code"]
             
@@ -99,7 +99,7 @@ def main():
             
             critic_feedback = critique
             
-            print("Review completed.")
+            print("\n  Review completed.")
 
         # Final Test Execution
         print(f"\nTask {task_id} Completed")
