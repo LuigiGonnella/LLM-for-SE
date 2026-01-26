@@ -1,23 +1,41 @@
 #!/usr/bin/env python3
 """
-Batch testing script for running the single-agent pipeline across multiple models.
+Batch testing script for running single-agent or multi-agent pipeline across multiple models.
 
 Usage:
-    python -m scripts.batch_test --models codellama:7b-instruct deepseek-coder-v2:16b
-    python -m scripts.batch_test --domains strings lists
-    python -m scripts.batch_test --output results.csv
+    # Single-agent mode
+    python -m scripts.batch_test --mode single --models codellama:7b-instruct
+    
+    # Multi-agent mode
+    python -m scripts.batch_test --mode multi --models deepseek-coder-v2:16b
+    
+    # Test specific domains
+    python -m scripts.batch_test --mode single --domains strings lists
+    
+    # Save results to CSV
+    python -m scripts.batch_test --mode multi --output results.csv
 """
 
 import argparse
 import csv
+import json
 from datetime import datetime
-
+import sys
+from pathlib import Path
 from tqdm import tqdm
+# Add project root to Python path
+project_root = Path(__file__).parent.parent
+sys.path.insert(0, str(project_root))
 
 from src.core.single_agent.pipeline import build_single_agent_graph
+from src.core.multi_agent.agents.planner.agent import PlannerAgent
+from src.core.multi_agent.agents.coder.agent import CoderAgent
+from src.core.multi_agent.agents.critic.agent import CriticAgent
 from src.utils.task_loader import load_tasks
 from src.utils.test_runner import run_tests_silent
 from src.utils.config import config
+from src.tools.executor import execute_code
+from src.evaluation.quality_metrics import compute_quality_metrics
 
 TASK_DOMAINS = {
     "strings": ("data/strings/strings-tasks.json", "data/strings/strings-tests.py"),
@@ -28,8 +46,8 @@ TASK_DOMAINS = {
 }
 
 
-def run_task(graph, model, task, test_path):
-    """Run a single task and return results dict."""
+def run_task_single_agent(graph, model, task, test_path):
+    """Run a single task using single-agent pipeline and return results dict."""
     state = {
         "task_id": task["id"],
         "signature": task["signature"],
@@ -62,6 +80,90 @@ def run_task(graph, model, task, test_path):
     except Exception as e:
         return {
             "task_id": task["id"],
+            "difficulty": task.get("difficulty", "N/A"),
+            "passed": 0,
+            "failed": 0,
+            "error": str(e),
+        }
+
+
+def run_task_multi_agent(agents, task, test_path, max_retries=2):
+    """Run a single task using multi-agent pipeline and return results dict."""
+    planner, coder, critic = agents
+    task_id = task["id"]
+    
+    try:
+        # 1. Planning Phase
+        plan_result = planner.create_plan(
+            task_id=task_id,
+            user_request=task.get("docstring") or f"Implement {task.get('signature')}",
+            verbose=False
+        )
+        
+        if not plan_result:
+            return {
+                "task_id": task_id,
+                "difficulty": task.get("difficulty", "N/A"),
+                "passed": 0,
+                "failed": 0,
+                "error": "Planning failed",
+            }
+        
+        plan_str = json.dumps(plan_result, indent=2)
+        current_code = None
+        critic_feedback = None
+        exec_summary = None
+        
+        # 2. Coder-Critic Loop
+        for attempt in range(max_retries + 1):
+            # Generate Code
+            coder_result = coder.generate_code(
+                task_id=task_id,
+                signature=task["signature"],
+                plan=plan_str,
+                critic_feedback=critic_feedback,
+                exec_summary=exec_summary,
+                verbose=False
+            )
+            
+            if not coder_result["success"]:
+                break
+                
+            current_code = coder_result["code"]
+            
+            # Execute and get metrics
+            exec_summary = execute_code(current_code)
+            metrics = compute_quality_metrics(current_code)
+            
+            # Critique
+            critic_feedback = critic.critique(
+                task_id=task_id,
+                signature=task["signature"],
+                docstring=task["docstring"],
+                plan=plan_str,
+                code=current_code,
+                exec_summary=exec_summary,
+                quality_metrics=metrics,
+                verbose=False
+            )
+        
+        # 3. Final Testing
+        if current_code:
+            passed, failed, error = run_tests_silent(task_id, current_code, test_path)
+        else:
+            passed, failed, error = 0, 0, "No code generated"
+        
+        return {
+            "task_id": task_id,
+            "difficulty": task.get("difficulty", "N/A"),
+            "passed": passed,
+            "failed": failed,
+            "error": error,
+        }
+        
+    except Exception as e:
+        return {
+            "task_id": task_id,
             "difficulty": task.get("difficulty", "N/A"),
             "passed": 0,
             "failed": 0,
@@ -117,8 +219,15 @@ def print_results_table(model, results):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Batch test single-agent pipeline")
-    parser.add_argument("--models", nargs="+", default=[config.model_name])
+    parser = argparse.ArgumentParser(description="Batch test single-agent or multi-agent pipeline")
+    parser.add_argument(
+        "--mode",
+        type=str,
+        choices=["single", "multi"],
+        default="single",
+        help="Pipeline mode: single-agent or multi-agent"
+    )
+    parser.add_argument("--models", nargs="+", default=[config.base_model])
     parser.add_argument(
         "--domains",
         nargs="+",
@@ -127,17 +236,40 @@ def main():
     )
     parser.add_argument("--output", type=str, help="Output CSV file")
     parser.add_argument("--task-id", type=str, help="Run only specific task")
+    parser.add_argument(
+        "--max-retries",
+        type=int,
+        default=2,
+        help="Max iterations between Coder and Critic (multi-agent only)"
+    )
     args = parser.parse_args()
 
-    graph = build_single_agent_graph()
+    # Initialize pipeline based on mode
+    if args.mode == "single":
+        graph = build_single_agent_graph()
+        agents = None
+    else:  # multi-agent
+        graph = None
+        # Initialize agents (all use the same model from --models)
+        agents = None  # Will be created per model
+    
     all_results = []
 
     print(f"Batch test started: {datetime.now():%Y-%m-%d %H:%M:%S}")
+    print(f"Mode: {args.mode.upper()}-AGENT")
     print(f"Models: {args.models}")
     print(f"Domains: {args.domains}")
 
     for model in args.models:
         model_results = []
+        
+        # Create agents for multi-agent mode
+        if args.mode == "multi":
+            agents = (
+                PlannerAgent(model=model),
+                CoderAgent(model=model),
+                CriticAgent(model=model)
+            )
 
         for domain in args.domains:
             tasks_file, tests_file = TASK_DOMAINS[domain]
@@ -151,7 +283,13 @@ def main():
             pbar = tqdm(tasks, desc="Tasks", unit="task", leave=True)
             for task in pbar:
                 pbar.set_description(f"{task['id']}")
-                result = run_task(graph, model, task, tests_file)
+                
+                # Run task based on mode
+                if args.mode == "single":
+                    result = run_task_single_agent(graph, model, task, tests_file)
+                else:  # multi-agent
+                    result = run_task_multi_agent(agents, task, tests_file, args.max_retries)
+                
                 result["model"] = model
                 result["domain"] = domain
                 model_results.append(result)

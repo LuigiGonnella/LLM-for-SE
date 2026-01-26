@@ -126,10 +126,16 @@ def run_external_tests(task_id, generated_code, test_path):
     os.remove(temp_file_name)
 
 
-def run_tests_silent(task_id, generated_code, test_path):
+def run_tests_silent(task_id, generated_code, test_path, debug=False):
     """
     Run tests silently and return (passed, failed, error_msg).
     Returns (0, 0, error_msg) if tests cannot be run.
+    
+    Args:
+        task_id: Task identifier
+        generated_code: The code to test
+        test_path: Path to the test file
+        debug: If True, saves temp test file and prints full output on failure
     """
     import re
 
@@ -159,23 +165,58 @@ def run_tests_silent(task_id, generated_code, test_path):
         temp_test_file.write(test_class_code)
 
     try:
-        cmd = [sys.executable, "-m", "pytest", temp_file_name, "-v", "--tb=no"]
+        cmd = [sys.executable, "-m", "pytest", temp_file_name, "-v", "--tb=short"]
         result = subprocess.run(cmd, capture_output=True, text=True, timeout=60)
         output = result.stdout + result.stderr
 
         passed = 0
         failed = 0
+        error_msg = ""
+        
+        # Try multiple regex patterns for different pytest output formats
         if match := re.search(r"(\d+) passed", output):
             passed = int(match.group(1))
         if match := re.search(r"(\d+) failed", output):
             failed = int(match.group(1))
-
-        error_msg = "" if result.returncode == 0 else "Some tests failed"
+        
+        # If no tests were collected/run
+        if "no tests ran" in output.lower() or "collected 0 items" in output.lower():
+            error_msg = "No tests collected"
+        # Check for pytest module import error
+        elif "No module named" in output and "pytest" in output:
+            error_msg = "pytest not installed"
+        # Check for syntax errors in generated code
+        elif "SyntaxError" in output:
+            error_msg = "Syntax error in generated code"
+        # Check for import errors
+        elif "ImportError" in output or "ModuleNotFoundError" in output:
+            # Extract specific import error
+            if match := re.search(r"(ImportError|ModuleNotFoundError): (.+)", output):
+                error_msg = match.group(0)
+            else:
+                error_msg = "Import error in test execution"
+        # Generic failure message
+        elif result.returncode != 0 and passed == 0 and failed == 0:
+            # Extract first error line if available
+            error_lines = [line for line in output.split("\n") if "ERROR" in line or "FAILED" in line]
+            error_msg = error_lines[0] if error_lines else "Tests failed to run"
+        elif failed > 0:
+            error_msg = f"{failed} test(s) failed"
+        
+        # Debug mode: save temp file and print output
+        if debug and (passed == 0 or failed > 0):
+            debug_file = f"debug_test_{task_id}.py"
+            import shutil
+            shutil.copy(temp_file_name, debug_file)
+            print(f"\n[DEBUG] Test file saved to: {debug_file}")
+            print(f"[DEBUG] Full pytest output:\n{output}\n")
+        
         return passed, failed, error_msg
 
     except subprocess.TimeoutExpired:
-        return 0, 0, "Test timeout"
+        return 0, 0, "Test timeout (>60s)"
     except Exception as e:
-        return 0, 0, str(e)
+        return 0, 0, f"Exception: {str(e)}"
     finally:
-        os.remove(temp_file_name)
+        if os.path.exists(temp_file_name):
+            os.remove(temp_file_name)

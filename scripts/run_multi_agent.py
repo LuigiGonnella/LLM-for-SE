@@ -1,5 +1,11 @@
 import argparse
 import json
+import sys
+from pathlib import Path
+
+# Add project root to Python path
+project_root = Path(__file__).parent.parent
+sys.path.insert(0, str(project_root))
 
 from src.core.multi_agent.agents.planner.agent import PlannerAgent
 from src.core.multi_agent.agents.coder.agent import CoderAgent
@@ -15,9 +21,9 @@ def main():
     parser = argparse.ArgumentParser(description="Run Multi-Agent Coding Pipeline (Planner -> Coder -> Critic)")
     parser.add_argument("--task-file", default="data/test-tasks.json", help="Path to task file")
     parser.add_argument("--test-file", type=str, help="Path to external tests file")
-    parser.add_argument("--model-planner", type=str, default=config.model_name, help="LLM model to use for Planner")
-    parser.add_argument("--model-coder", type=str, default=config.model_name, help="LLM model to use for Coder")
-    parser.add_argument("--model-critic", type=str, default=config.model_name, help="LLM model to use for Critic")
+    parser.add_argument("--model-planner", type=str, default=config.planner_model, help="LLM model to use for Planner")
+    parser.add_argument("--model-coder", type=str, default=config.coder_model, help="LLM model to use for Coder")
+    parser.add_argument("--model-critic", type=str, default=config.critic_model, help="LLM model to use for Critic")
     parser.add_argument("--max-retries", type=int, default=3, help="Max iterations between Coder and Critic")
     parser.add_argument("--verbose", action="store_true", help="Show detailed agent output")
     
@@ -54,6 +60,7 @@ def main():
         plan_str = json.dumps(plan_result, indent=2)
         
         current_code = None
+        last_successful_code = None  # Track last working code
         critic_feedback = None
         exec_summary = None
         
@@ -73,10 +80,15 @@ def main():
             
             if not coder_result["success"]:
                 print("\n[Coder] Code generation failed.")
+                # Fallback: use last successful code if available
+                if last_successful_code:
+                    print(f"[Coder] Using code from iteration {attempt-1} as fallback.")
+                    current_code = last_successful_code
                 break
+            
             print("\n[Coder] Code generated.")
-                
             current_code = coder_result["code"]
+            last_successful_code = current_code  # Save successful code
             
             # Execute code
             exec_summary = execute_code(current_code)

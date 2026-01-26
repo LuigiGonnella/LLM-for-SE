@@ -34,7 +34,7 @@ def main():
     parser.add_argument(
         "--model",
         type=str,
-        default=config.model_name,
+        default=config.base_model,
         help="LLM model to use (default: %(default)s)",
     )
     args = parser.parse_args()

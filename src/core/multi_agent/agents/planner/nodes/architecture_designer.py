@@ -13,9 +13,9 @@ def architecture_design_node(state: AgentState) -> AgentState:
     """
     print("\n  - PHASE 3: ARCHITECTURE DESIGN")
 
-    requirements_summary = compress_phase_output(
-        "requirements", state.get("requirements", {})
-    )
+    # Get task context
+    intent_summary = compress_phase_output("intent_analysis", state.get("intent_analysis", {}))
+    requirements_summary = compress_phase_output("requirements", state.get("requirements", {}))
 
     # Include feedback from quality review if this is a refinement iteration
     feedback_section = ""
@@ -38,24 +38,37 @@ The previous architecture had these issues:
 Please address these in your revised design.
 """
 
-    user_prompt = f"""## Task
-Design the optimal architecture to satisfy these requirements.
+    user_prompt = f"""## Task: {state.get('task_id', 'N/A')}
+User Request: {state.get('user_request', 'N/A')}
 
-## Requirements
+## Context
+{intent_summary}
+
+## Requirements to Satisfy
 {requirements_summary}
 {feedback_section}
 
 ## Your Mission
-1. Decompose into single-responsibility components
-2. Select appropriate design patterns with justification
-3. Choose optimal data structures with O(n) analysis
-4. Recommend specific algorithms
-5. Design exception hierarchy
-6. Define clear component interfaces
+Design the SIMPLEST architecture that satisfies requirements.
+
+IMPORTANT - Architecture Complexity Guidelines:
+- For simple algorithms (FizzBuzz, sum, filter): Usually ONE component (the main function)
+- For moderate tasks (sorting, search): 2-3 components maximum
+- For complex systems (parsers, games): Multiple components with clear separation
+
+DO NOT over-engineer! Avoid factory patterns, abstract classes, or multiple components unless genuinely needed.
+
+Your Design Tasks:
+1. Identify components (prefer 1-2 for simple problems)
+2. Choose appropriate design pattern ONLY if it simplifies the solution
+3. Select optimal data structures with O(n) analysis
+4. Recommend specific algorithm approach
+5. Define exception handling strategy
+6. Specify component interfaces (function signatures)
 
 ## Instructions
 Think through design alternatives in <thinking> tags.
-Consider trade-offs (performance vs complexity, memory vs speed).
+Ask yourself: "Is this the SIMPLEST solution that works?"
 Then provide your architecture in <output> tags as JSON.
 
 ## Design Principles

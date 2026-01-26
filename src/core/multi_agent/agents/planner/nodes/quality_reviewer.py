@@ -50,17 +50,28 @@ Validate that this plan is comprehensive enough for a coder agent to implement p
 Think critically in <thinking> tags about gaps and issues.
 Then provide your review in <output> tags as JSON.
 
-## Approval Criteria
-- Score >= 8 AND all critical issues resolved: APPROVED
-- Score < 8 OR critical issues remain: NEEDS_REVISION
+## Approval Criteria (Be Pragmatic)
+- Score >= 6 AND no CRITICAL blockers: APPROVED ✓
+- Score < 6 OR critical blockers exist: NEEDS_REVISION
+
+## What Counts as CRITICAL?
+- Missing core functional requirements
+- Fundamentally flawed algorithm choice
+- Completely unclear implementation steps
+
+## NOT Critical (minor issues are OK):
+- Missing minor edge cases (coder can handle)
+- Could be more detailed (good enough is fine)
+- Minor optimization opportunities
 
 ## Important
+Only request revision for CRITICAL issues. The coder agent is capable and will handle details.
 If you find issues, specify which phase needs revision:
 - "requirements_engineering": Wrong requirements or missing constraints
 - "architecture_design": Flawed component design or algorithm choice
-- "implementation_planning": Unclear steps or missing validations
+- "implementation_planning": Completely unclear steps
 
-You are reviewing the PLAN (not code). The coder agent generates code later.
+Remember: You are reviewing the PLAN (not code). The coder agent generates code later and can fill gaps.
 """
 
     response = call_llm(
@@ -76,15 +87,31 @@ You are reviewing the PLAN (not code). The coder agent generates code later.
         approval_status = quality_review.get("approval_status", "needs_revision")
         completeness = quality_review.get("completeness_score", 0)
         issues = quality_review.get("issues", [])
+        
+        # Count critical issues
+        critical_issues = [i for i in issues if i.get("severity") == "critical"]
+        
+        # Auto-approve on final iteration to prevent infinite loops
+        current_iteration = state.get("iteration_count", 0)
+        if current_iteration >= 2:
+            approval_status = "approved"
+            is_approved = True
+            if state.get("show_node_info"):
+                print(f"    Auto-approving (max iterations reached)")
+        # Override: auto-approve if score >= 6 and no critical issues
+        elif completeness >= 6 and len(critical_issues) == 0:
+            approval_status = "approved"
+            is_approved = True
+        else:
+            is_approved = approval_status == "approved"
 
         if state.get("show_node_info"):
             print(f"    Completeness Score: {completeness}/10")
-            print(f"    Issues Found: {len(issues)}")
-            for issue in issues[:3]:  # Show top 3
-                print(f"      - [{issue.get('severity')}] {issue.get('description')[:60]}...")
-            print(f"    {'APPROVED' if approval_status == 'approved' else 'NEEDS REVISION'}")
-
-        is_approved = approval_status == "approved"
+            print(f"    Critical Issues: {len(critical_issues)}/{len(issues)}")
+            if critical_issues:
+                for issue in critical_issues[:2]:  # Show top 2 critical
+                    print(f"      - [CRITICAL] {issue.get('description')[:60]}...")
+            print(f"    {'✓ APPROVED' if is_approved else '✗ NEEDS REVISION'}")
         state["plan_approved"] = is_approved
         
         # Increment iteration count if not approved

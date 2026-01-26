@@ -13,17 +13,25 @@ def implementation_planning_node(state: AgentState) -> AgentState:
     """
     print("\n  - PHASE 4: IMPLEMENTATION PLANNING")
 
-    architecture_summary = compress_phase_output(
-        "architecture", state.get("architecture", {})
-    )
+    # Get compressed summaries
+    intent_summary = compress_phase_output("intent_analysis", state.get("intent_analysis", {}))
+    requirements_summary = compress_phase_output("requirements", state.get("requirements", {}))
+    architecture_summary = compress_phase_output("architecture", state.get("architecture", {}))
 
-    user_prompt = f"""## Task
-Create detailed step-by-step implementation guidance for this architecture.
+    user_prompt = f"""## Task: {state.get('task_id', 'N/A')}
+User Request: {state.get('user_request', 'N/A')}
 
-## Architecture
+## Context
+{intent_summary}
+
+{requirements_summary}
+
+## Architecture to Implement
 {architecture_summary}
 
 ## Your Mission
+Create detailed step-by-step implementation guidance for the coder agent.
+
 1. Determine implementation order (respect dependencies)
 2. Break each component into atomic implementation steps
 3. Specify exact input validation checks
@@ -33,7 +41,16 @@ Create detailed step-by-step implementation guidance for this architecture.
 ## Instructions
 Think through the implementation sequence in <thinking> tags.
 Consider what a coder needs to know at each step.
-Then provide the complete plan in <output> tags as JSON.
+
+CRITICAL: You MUST wrap your final JSON output in <output></output> tags like this:
+<output>
+{{
+  "your": "json",
+  "goes": "here"
+}}
+</output>
+
+Do NOT output raw JSON without the <output> tags. This will cause parsing failures.
 
 ## Guidelines
 - Each step should be implementable in ~5-10 lines of code

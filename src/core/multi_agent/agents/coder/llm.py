@@ -472,10 +472,16 @@ def generate_code(
         )
 
     prompt += (
-        "FINAL CHECK BEFORE RESPONDING:\n"
-        "- The output must start with 'def'\n"
-        "- The output must contain exactly one function\n"
-        "- No text before or after the code\n"
+        "CRITICAL OUTPUT FORMAT REQUIREMENTS:\n"
+        "1. Your response must be PURE PYTHON CODE ONLY\n"
+        "2. Start immediately with 'def " + signature.split('(')[0].replace('def ', '').strip() + "'\n"
+        "3. NO explanations, NO markdown, NO text before or after\n"
+        "4. NO ```python code blocks - JUST THE RAW FUNCTION\n"
+        "5. Complete the entire function implementation\n\n"
+        "EXAMPLE OF CORRECT FORMAT:\n"
+        "def function_name(param):\n"
+        "    # implementation\n"
+        "    return result\n"
     )
 
     return call_llm(

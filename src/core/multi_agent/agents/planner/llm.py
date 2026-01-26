@@ -22,10 +22,15 @@ def extract_and_parse_json(response: str, max_attempts: int = 3) -> Dict[Any, An
     
     candidates = []
     
-    # 1. Clean thinking blocks first
+    # 1. First priority: Extract from <output> tags if present
+    output_match = re.search(r"<output>\s*(.+?)\s*</output>", response, re.DOTALL)
+    if output_match:
+        candidates.append(output_match.group(1).strip())
+    
+    # 2. Clean thinking blocks for subsequent parsing
     clean_text = re.sub(r"<thinking>.*?</thinking>", "", response, flags=re.DOTALL).strip()
     
-    # 2. Heuristic: Brace Counting
+    # 3. Heuristic: Brace Counting
     # Find all top-level {} blocks in the cleaned text, or original text if clean failed
     target_text = clean_text if clean_text else response
     
@@ -52,20 +57,30 @@ def extract_and_parse_json(response: str, max_attempts: int = 3) -> Dict[Any, An
         
         if char != '\\':
             escape = False
-            
-    # Add regex candidates as fallback
-    regex_candidates = []
-    output_match = re.search(r"<output>\s*(.+?)\s*</output>", response, re.DOTALL)
-    if output_match:
-        regex_candidates.append(output_match.group(1))
-        
+    
+    # 4. Add code block candidates as fallback
     code_match = re.search(r"```(?:json)?\s*(.+?)\s*```", response, re.DOTALL)
     if code_match:
-        regex_candidates.append(code_match.group(1))
+        candidates.append(code_match.group(1).strip())
+    
+    # 5. Try to find any JSON-like structure after common markers
+    json_markers = [
+        r"(?:Output|Result|Response):\s*(\{.+\})",
+        r"(?:^|\n)(\{[\s\S]*\})\s*(?:$|\n)",  # Standalone JSON block
+    ]
+    for pattern in json_markers:
+        marker_match = re.search(pattern, target_text, re.DOTALL | re.MULTILINE)
+        if marker_match:
+            candidates.append(marker_match.group(1).strip())
         
-    # Process all candidates (Brace ones first, then regex)
-    # Prefer the LAST brace candidate (often the final output)
-    all_candidates = list(reversed(candidates)) + regex_candidates
+    # Process all candidates (output tag first, then brace-counted, then others)
+    # Remove duplicates while preserving order
+    seen = set()
+    all_candidates = []
+    for c in candidates:
+        if c and c not in seen:
+            all_candidates.append(c)
+            seen.add(c)
     
     for json_str in all_candidates:
         if not json_str: 
@@ -73,26 +88,55 @@ def extract_and_parse_json(response: str, max_attempts: int = 3) -> Dict[Any, An
             
         # Clean common issues
         json_str = json_str.strip()
-        json_str = re.sub(r",\s*([}\]])", r"\1", json_str) # Trailing commas
+        
+        # Remove markdown formatting if present
+        json_str = re.sub(r"^```(?:json)?\s*", "", json_str)
+        json_str = re.sub(r"\s*```$", "", json_str)
+        
+        # Remove trailing commas
+        json_str = re.sub(r",\s*([}\]])", r"\1", json_str)
         
         try:
             return json.loads(json_str, strict=False)
         except json.JSONDecodeError:
+            # Try fixing unescaped newlines
             try:
                 fixed_str = json_str.replace('\n', '\\n')
                 return json.loads(fixed_str, strict=False)
             except json.JSONDecodeError:
-                continue
+                # Try with more aggressive cleaning
+                try:
+                    # Remove comments
+                    cleaned = re.sub(r'//.*?$', '', json_str, flags=re.MULTILINE)
+                    cleaned = re.sub(r'/\*.*?\*/', '', cleaned, flags=re.DOTALL)
+                    return json.loads(cleaned, strict=False)
+                except json.JSONDecodeError:
+                    continue
 
-    # Final Attempt: The whole response
+    # Final Attempt: The whole response (after cleaning thinking tags)
     try:
-        return json.loads(response.strip(), strict=False)
+        return json.loads(clean_text.strip(), strict=False)
     except json.JSONDecodeError:
         pass
+    
+    # Last resort: Try to extract anything that looks like JSON from the raw response
+    # Look for largest {...} block even if malformed
+    all_braces = re.findall(r'\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}', response, re.DOTALL)
+    for attempt in all_braces:
+        try:
+            cleaned = re.sub(r',\s*([}\]])', r'\1', attempt)
+            return json.loads(cleaned, strict=False)
+        except json.JSONDecodeError:
+            continue
 
-    # All attempts failed
+    # All attempts failed - provide helpful error
+    if '<thinking>' in response and '<output>' not in response:
+        error_msg = "Model produced <thinking> but forgot <output> tags. No JSON found."
+    else:
+        error_msg = f"Failed to parse JSON after attempting {len(all_candidates)} extractions."
+    
     raise json.JSONDecodeError(
-        f"Failed to parse JSON after attempting {len(all_candidates)} extractions. Response: {response[:200]}...",
+        f"{error_msg} Response preview: {response[:500]}...",
         response,
         0,
     )
@@ -155,35 +199,30 @@ CORE PRINCIPLES:
 - PRODUCTION MINDSET: Think like a senior engineer shipping to production
 - ACTIONABILITY: Every statement must be implementable
 
-REASONING PROCESS (Chain-of-Thought):
-Use this two-stage thinking process:
+CRITICAL OUTPUT FORMAT (READ THIS CAREFULLY):
+You MUST use this exact two-stage format in EVERY response:
 
-1. INTERNAL REASONING (in <thinking> tags):
-   - Analyze the problem space step-by-step
-   - Consider multiple approaches and trade-offs
-   - Evaluate constraints and edge cases
-   - Think through WHY each decision matters
-   
-2. STRUCTURED OUTPUT (in <output> tags):
-   - Format your final answer as valid JSON
-   - Follow the exact schema provided
-   - Be precise and actionable
+1. REASONING (in <thinking> tags):
+   Think through the problem step by step.
 
-RESPONSE FORMAT:
+2. JSON OUTPUT (in <output> tags):
+   Your final answer as valid JSON.
+
+EXAMPLE OF REQUIRED FORMAT:
 <thinking>
-Your step-by-step reasoning here...
-- What is the core problem?
-- What approaches could work?
-- What are the trade-offs?
-- What edge cases exist?
+Let me think about this step by step...
+- First consideration
+- Second consideration
 </thinking>
 
 <output>
-{
-  "your": "json",
-  "response": "here"
-}
+{{
+  "key": "value",
+  "another_key": ["list", "items"]
+}}
 </output>
+
+FAILURE TO USE BOTH TAGS WILL CAUSE PARSING ERRORS!
 
 JSON OUTPUT REQUIREMENTS (CRITICAL):
 Inside <output> tags, provide ONLY valid JSON:
@@ -216,6 +255,8 @@ INTENT_ANALYZER_SPECIFIC = """
 YOUR ROLE: Expert requirements analyst specializing in intent extraction.
 
 YOUR TASK: Deeply understand the user's request and extract the true problem being solved.
+
+CRITICAL: You MUST wrap your JSON output in <output></output> tags. Do NOT output raw JSON without these tags.
 
 ANALYSIS CHECKLIST:
 1. CORE INTENT: What is the real problem?
@@ -274,6 +315,8 @@ REQUIREMENTS_ENGINEER_SPECIFIC = """
 YOUR ROLE: Elite requirements engineer for production systems.
 
 YOUR TASK: Transform intent into comprehensive, testable requirements.
+
+CRITICAL: You MUST wrap your JSON output in <output></output> tags. Do NOT output raw JSON without these tags.
 
 REQUIREMENTS CHECKLIST:
 1. FUNCTIONAL REQUIREMENTS: What must the code do?
@@ -382,6 +425,8 @@ YOUR ROLE: Principal software architect specializing in clean, scalable design.
 
 YOUR TASK: Design the optimal architecture that satisfies all requirements.
 
+CRITICAL: You MUST wrap your JSON output in <output></output> tags. Do NOT output raw JSON without these tags.
+
 DESIGN CHECKLIST:
 1. DECOMPOSITION: Break into single-responsibility components
 2. DESIGN PATTERNS: Select appropriate patterns with justification
@@ -461,6 +506,8 @@ IMPLEMENTATION_PLANNER_SPECIFIC = """
 YOUR ROLE: Senior developer creating implementation blueprints.
 
 YOUR TASK: Transform architecture into step-by-step implementation instructions.
+
+CRITICAL: You MUST wrap your JSON output in <output></output> tags. Do NOT output raw JSON without these tags.
 
 PLANNING CHECKLIST:
 1. IMPLEMENTATION ORDER: Sequence components based on dependencies
@@ -589,6 +636,8 @@ YOUR ROLE: Senior planning architect reviewing plan quality before handoff to co
 
 YOUR TASK: Validate that this plan is comprehensive enough for a developer agent to implement production-grade code without questions.
 
+CRITICAL: You MUST wrap your JSON output in <output></output> tags. Do NOT output raw JSON without these tags.
+
 PLAN REVIEW CHECKLIST:
 1. COMPLETENESS (Score 0-10): Does the plan address all functional and non-functional requirements?
 2. CLARITY: Can a coder agent implement from this plan without ambiguity?
@@ -596,9 +645,12 @@ PLAN REVIEW CHECKLIST:
 4. FEASIBILITY: Are architectural decisions and complexity targets realistic?
 5. READINESS: Is this plan ready for handoff to the coder agent?
 
-APPROVAL CRITERIA:
-- Score >= 8 AND all critical issues resolved: APPROVED (ready for coder agent)
-- Score < 8 OR critical issues remain: NEEDS_REVISION (send back to architecture phase)
+APPROVAL CRITERIA (Be Pragmatic):
+- Score >= 6 AND no CRITICAL blockers: APPROVED (ready for coder agent)
+- Score < 6 OR critical blockers exist: NEEDS_REVISION
+
+CRITICAL means: missing core requirements, fundamentally flawed design, or completely unclear steps.
+Minor issues are OK - the coder agent is capable.
 
 YOUR OUTPUT SCHEMA:
 {
