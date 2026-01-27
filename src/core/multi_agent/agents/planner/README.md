@@ -139,7 +139,13 @@ errors: List[str]                     # Error log
 
 **Why it matters:** Ensures only high-quality plans reach the coding stage, saving compute and protecting code quality.
 
----
+## Error Handling
+
+Errors are tracked in `state["errors"]` and fail gracefully:
+
+1.  **Refinement Limit**: The agent will retry up to 2 times if the Quality Reviewer rejects the plan. After that, it proceeds with a "best effort" plan to avoid infinite loops.
+2.  **Phase Failures**: If a specific phase (e.g., Architecture) fails to generate valid JSON, the pipeline logs the error and attempts to continue or fail fast depending on severity.
+3.  **Validation Gates**: The `should_refine` conditional edge ensures that we don't pass garbage to the consolidation phase unless we've exhausted our options.
 
 ## Usage
 
@@ -164,30 +170,6 @@ if plan.get("approved"):
     print(f"Architecture: {len(plan['architecture']['components'])} components")
 else:
     print("Plan generated (Best Effort)")
-```
-
-### JSON Output Structure
-
-The final plan is a comprehensive dictionary ready for the Coder Agent:
-
-```json
-{
-  "task_id": "task_123",
-  "approved": true,
-  "intent": { ... },
-  "requirements": {
-    "functional": [...],
-    "edge_cases": [...]
-  },
-  "architecture": {
-    "components": [...],
-    "design_patterns": [...]
-  },
-  "implementation": {
-    "steps": [...],
-    "validation": [...]
-  }
-}
 ```
 
 ## Integration

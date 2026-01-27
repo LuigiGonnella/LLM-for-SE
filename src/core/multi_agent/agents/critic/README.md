@@ -4,8 +4,6 @@
 
 The **Critic Agent** is a specialized multi-node LLM agent responsible for code review and quality assurance. It acts as a rigorous gatekeeper, validating generated code against functional requirements, correctness, and quality standards before it is accepted.
 
-Unlike simple "single-pass" reviewers, this agent uses a structured pipeline to separate concerns: first verifying functional correctness, then assessing code quality, and finally synthesizing a constructive critique.
-
 ## Architecture
 
 ### 4-Phase Linear Pipeline
@@ -103,7 +101,13 @@ feedback: str                         # Synthesized critique
 
 **Why it matters:** The Coder agent needs actionable instructions, not just a list of complaints.
 
----
+## Error Handling
+
+Errors are accumulated in `state["errors"]` and fail gracefully:
+
+1.  **Input Failures**: If the `Input Validator` finds missing data (e.g., no code), the pipeline stops immediately.
+2.  **Analysis Failures**: If the LLM fails to produce valid JSON for the correctness checking, we default to a "neutral" state rather than crashing, but flag the error in the execution logs.
+3.  **Synthesis Fallback**: If the synthesizer fails, we return the raw findings from the Correctness/Quality nodes so the Coder at least gets *some* feedback.
 
 ## Usage
 
@@ -120,7 +124,8 @@ critique = critic.critique(
     docstring="Calculate factorial of n",
     plan="Recursive implementation...",
     code="def factorial(n): return n * factorial(n-1)", # Missing base case
-    exec_summary="RecursionError: maximum recursion depth exceeded"
+    exec_summary="RecursionError: maximum recursion depth exceeded",
+    quality_metrics={ "cyclomatic_complexity": 5 } # Optional external metrics
 )
 
 print(critique)

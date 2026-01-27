@@ -4,58 +4,30 @@
 
 The **Coder Agent** is a specialized multi-node LLM agent responsible for generating production-grade Python code. It receives a detailed implementation plan from the Planner Agent and transforms it into correct, optimized, and well-structured code through a 6-phase pipeline.
 
-Unlike single-node code generators, this multi-node architecture provides:
-- **Higher specialization** - Each node focuses on one responsibility
-- **Early validation** - Issues caught before expensive LLM calls
-- **Improved quality** - Chain-of-thought reasoning guides generation
-- **Clear debugging** - Easy to identify which phase failed
-- **Graceful degradation** - Optimization failures don't block code delivery
-
 ## Architecture
 
 ### 6-Phase Pipeline
 
+```mermaid
+graph TD
+    Start([Start]) --> Validator[PHASE 1: Input Validator]
+    Validator --> EdgeAnalysis[PHASE 2: Edge Case Analyzer]
+    EdgeAnalysis --> CoT[PHASE 3: CoT Generator]
+    CoT --> Gen[PHASE 4: Code Generator]
+    Gen --> Val[PHASE 5: Code Validator]
+    Val --> Opt[PHASE 6: Code Optimizer]
+    Opt --> Consolidation[Consolidation]
+    Consolidation --> End([End])
 ```
-START
-  ↓
-[PHASE 1: Input Validator]     ← Validates signature, plan, parameters
-  ├─ Check function signature syntax
-  ├─ Validate plan structure/clarity
-  └─ Ensure all required inputs present
-  ↓
-[PHASE 2: Edge Case Analyzer]  ← Identify potential edge cases
-  ├─ Analyze input types from signature
-  ├─ Identify boundary conditions
-  └─ Generate edge case checklist
-  ↓
-[PHASE 3: CoT Generator]       ← Create structured thinking
-  ├─ Generate step-by-step reasoning
-  ├─ Reference identified edge cases
-  └─ Plan algorithm approach
-  ↓
-[PHASE 4: Code Generator]      ← Generate code using CoT as context
-  ├─ Use full context from all previous phases
-  ├─ Incorporate critic feedback if available
-  └─ Learn from execution summaries
-  ↓
-[PHASE 5: Code Validator]      ← Check syntax & basic logic
-  ├─ AST parsing for syntax errors
-  ├─ Detect infinite loops
-  ├─ Find unreachable code
-  └─ Flag logic warnings
-  ↓
-[PHASE 6: Code Optimizer]      ← Optimize code quality
-  ├─ Improve variable naming
-  ├─ Suggest algorithmic improvements
-  ├─ Follow Python best practices (PEP 8)
-  └─ Falls back to validated code if fails
-  ↓
-[CONSOLIDATION]                ← Package final output
-  ├─ Set final code for delivery
-  └─ Report generation status
-  ↓
-END → (Output to Critic Agent)
-```
+
+1.  **Input Validator**: Validates signature, plan, parameters.
+2.  **Edge Case Analyzer**: Identify potential edge cases.
+3.  **CoT Generator**: Create structured reasoning.
+4.  **Code Generator**: Generate code using CoT as context.
+5.  **Code Validator**: Check syntax & basic logic.
+6.  **Code Optimizer**: Optimize code quality.
+7.  **Consolidation**: Package final output.
+
 
 ## State Management
 
@@ -240,8 +212,6 @@ errors: List[str]                            # All errors accumulated
 **Output:**
 - `code`: Final output (ready for critic review)
 
----
-
 ## Usage
 
 ### Basic Usage
@@ -291,99 +261,6 @@ if not passes_critic_tests:
     )
 ```
 
-### With Verbose Output
-
-```python
-result = coder.generate_code(
-    task_id="task_001",
-    signature="def solve(n: int) -> int:",
-    plan="...",
-    verbose=True  # Prints detailed phase-by-phase output
-)
-```
-
-Output:
-```
-╔══════════════════════════════════════════════════════════╗
-║  PHASE 1: INPUT VALIDATION                               ║
-╚══════════════════════════════════════════════════════════╝
-
-✅ Input validation passed
-   • Signature: valid
-   • Plan: 87 words
-   • Task ID: task_001
-
-╔══════════════════════════════════════════════════════════╗
-║  PHASE 2: EDGE CASE ANALYSIS                             ║
-╚══════════════════════════════════════════════════════════╝
-
-📋 Identified 4 edge cases:
-   1. Input n = 0 (boundary value)
-   2. Input n < 0 (negative numbers)
-   3. Input n very large (overflow risk)
-   4. Empty input (None/null)
-
-[... continues for each phase ...]
-```
-
-## Return Value
-
-```python
-{
-    "success": bool,                    # True if code generated successfully
-    "code": Optional[str],              # Generated Python code
-    "error": Optional[str]              # Error message if failed
-}
-```
-
-## Integration with Multi-Agent System
-
-The Coder Agent fits into the larger pipeline:
-
-```
-User Request
-    ↓
-[Planner Agent] → Detailed Implementation Plan
-    ↓
-[Coder Agent] → Generated Python Code ← [Iteration if needed]
-    ↓              ↑
-[Critic Agent] → Tests & Feedback
-    ↓
-Final Code
-```
-
-**Handoff from Planner:** Receives detailed plan with requirements, architecture, and implementation steps.
-
-**Output to Critic:** Delivers generated code for testing and review. Critic feedback flows back for iteration.
-
-**Iteration Loop:** Can iterate with critic feedback and execution summaries until code passes all tests.
-
-## Design Decisions
-
-### Why 6 Nodes?
-- **Input Validator (1):** Early validation gate prevents wasted computation
-- **Edge Case Analyzer (2):** Explicit edge case analysis improves robustness
-- **CoT Generator (3):** Structured reasoning before coding improves quality
-- **Code Generator (4):** Focused on code generation with full context
-- **Code Validator (5):** Syntax validation ensures correctness
-- **Code Optimizer (6):** Polish and readability for production code
-
-### Why Linear Pipeline (No Conditional Routing)?
-Unlike the Planner Agent which has a refinement loop, the Coder Agent uses a linear pipeline because:
-- Each phase builds directly on previous outputs
-- No quality gate requiring backtracking
-- Critic agent handles iteration/refinement (separate responsibility)
-- Simpler debugging and monitoring
-
-### Why Graceful Fallbacks?
-- Optimization failures don't block code delivery (falls back to validated code)
-- Philosophy: Better to deliver working code than fail on polish
-
-### Why Edge Case Analysis as Separate Phase?
-- Forces explicit consideration of boundary conditions
-- Separates analysis (done once) from code generation (might iterate)
-- Improves robustness through dedicated attention
-
 ## Error Handling
 
 Errors are accumulated in `state["errors"]` throughout the pipeline:
@@ -397,11 +274,9 @@ Errors are accumulated in `state["errors"]` throughout the pipeline:
 
 Final result includes first error message (if any) in `result["error"]`.
 
-## Performance Considerations
+## Integration
 
-- **LLM Calls:** 4 per code generation (edge case analysis, CoT, generation, optimization)
-- **Context Size:** Grows with plan complexity and edge case count
-- **Fallback Strategy:** Optimization failure doesn't require re-running earlier phases
-- **Iteration:** With critic feedback, typically 1-2 iterations needed
+The Coder Agent acts as the **Hands** of the pipeline, transforming plans into executable code.
 
-
+- **Input**: Receives detailed implementation plans from the **Planner Agent**.
+- **Output**: Delivers generated code to the **Critic Agent** for review.
