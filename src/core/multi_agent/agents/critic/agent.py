@@ -2,11 +2,12 @@ from src.core.multi_agent.agents.critic.pipeline import build_critic_graph
 from src.core.multi_agent.agents.critic.state import CriticAgentState
 from typing import Dict, Any, Optional
 
+
 class CriticAgent:
     def __init__(self, model: str = "deepseek"):
         """
         Initialize the critic agent.
-        
+
         Args:
             model: Ollama model to use for critique
         """
@@ -26,7 +27,7 @@ class CriticAgent:
     ) -> str:
         """
         Generate critique for the provided code.
-        
+
         Args:
             task_id: Unique identifier
             signature: Function signature
@@ -36,7 +37,7 @@ class CriticAgent:
             exec_summary: Execution feedback
             quality_metrics: Computed quality metrics
             verbose: Show node info
-            
+
         Returns:
             The critique string (markdown)
         """
@@ -54,12 +55,12 @@ class CriticAgent:
             "should_proceed": True,
             "correctness_analysis": None,
             "quality_analysis": None,
-            "feedback": None
+            "feedback": None,
         }
 
         try:
             result = self.graph.invoke(initial_state)
             return result.get("feedback") or "Analysis failed."
-            
+
         except Exception as e:
             raise RuntimeError(f"Critique generation failed: {str(e)}") from e

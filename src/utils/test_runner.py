@@ -130,7 +130,7 @@ def run_tests_silent(task_id, generated_code, test_path, debug=False):
     """
     Run tests silently and return (passed, failed, error_msg).
     Returns (0, 0, error_msg) if tests cannot be run.
-    
+
     Args:
         task_id: Task identifier
         generated_code: The code to test
@@ -172,13 +172,13 @@ def run_tests_silent(task_id, generated_code, test_path, debug=False):
         passed = 0
         failed = 0
         error_msg = ""
-        
+
         # Try multiple regex patterns for different pytest output formats
         if match := re.search(r"(\d+) passed", output):
             passed = int(match.group(1))
         if match := re.search(r"(\d+) failed", output):
             failed = int(match.group(1))
-        
+
         # If no tests were collected/run
         if "no tests ran" in output.lower() or "collected 0 items" in output.lower():
             error_msg = "No tests collected"
@@ -198,19 +198,24 @@ def run_tests_silent(task_id, generated_code, test_path, debug=False):
         # Generic failure message
         elif result.returncode != 0 and passed == 0 and failed == 0:
             # Extract first error line if available
-            error_lines = [line for line in output.split("\n") if "ERROR" in line or "FAILED" in line]
+            error_lines = [
+                line
+                for line in output.split("\n")
+                if "ERROR" in line or "FAILED" in line
+            ]
             error_msg = error_lines[0] if error_lines else "Tests failed to run"
         elif failed > 0:
             error_msg = f"{failed} test(s) failed"
-        
+
         # Debug mode: save temp file and print output
         if debug and (passed == 0 or failed > 0):
             debug_file = f"debug_test_{task_id}.py"
             import shutil
+
             shutil.copy(temp_file_name, debug_file)
             print(f"\n[DEBUG] Test file saved to: {debug_file}")
             print(f"[DEBUG] Full pytest output:\n{output}\n")
-        
+
         return passed, failed, error_msg
 
     except subprocess.TimeoutExpired:

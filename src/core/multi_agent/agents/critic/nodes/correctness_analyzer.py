@@ -1,6 +1,7 @@
 from src.core.multi_agent.agents.critic.state import CriticAgentState
 from src.core.multi_agent.agents.critic.llm import analyze_correctness
 
+
 def correctness_analyzer_node(state: CriticAgentState) -> CriticAgentState:
     """
     Analyze functional correctness and logic.

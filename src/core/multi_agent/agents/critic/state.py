@@ -22,10 +22,10 @@ class CriticAgentState(TypedDict):
     # ═══ INTERNAL STATE ═══
     input_validation_errors: Optional[List[str]]
     should_proceed: bool
-    
+
     # Analysis results
     correctness_analysis: Optional[str]  # Findings on bugs/logic
-    quality_analysis: Optional[str]      # Findings on style/complexity
-    
+    quality_analysis: Optional[str]  # Findings on style/complexity
+
     # ═══ FINAL OUTPUT ═══
-    feedback: Optional[str]              # The final critique string
+    feedback: Optional[str]  # The final critique string

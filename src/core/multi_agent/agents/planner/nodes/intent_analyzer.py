@@ -6,6 +6,7 @@ from src.core.multi_agent.agents.planner.llm import (
 )
 import json
 
+
 def intent_analysis_node(state: AgentState) -> AgentState:
     """
     Extract core intent, classify task, identify success metrics.

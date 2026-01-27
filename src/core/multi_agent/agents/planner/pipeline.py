@@ -6,11 +6,21 @@ Architecture: 5-phase specialized planning workflow
 
 from langgraph.graph import StateGraph, START, END
 from src.core.multi_agent.agents.planner.state import AgentState
-from src.core.multi_agent.agents.planner.nodes.intent_analyzer import intent_analysis_node
-from src.core.multi_agent.agents.planner.nodes.requirements_engineer import requirements_engineering_node
-from src.core.multi_agent.agents.planner.nodes.architecture_designer import architecture_design_node
-from src.core.multi_agent.agents.planner.nodes.implementation_planner import implementation_planning_node
-from src.core.multi_agent.agents.planner.nodes.quality_reviewer import quality_review_node
+from src.core.multi_agent.agents.planner.nodes.intent_analyzer import (
+    intent_analysis_node,
+)
+from src.core.multi_agent.agents.planner.nodes.requirements_engineer import (
+    requirements_engineering_node,
+)
+from src.core.multi_agent.agents.planner.nodes.architecture_designer import (
+    architecture_design_node,
+)
+from src.core.multi_agent.agents.planner.nodes.implementation_planner import (
+    implementation_planning_node,
+)
+from src.core.multi_agent.agents.planner.nodes.quality_reviewer import (
+    quality_review_node,
+)
 from src.core.multi_agent.agents.planner.nodes.consolidation import consolidation_node
 
 
@@ -45,7 +55,7 @@ def should_refine(state: AgentState) -> str:
 
     print("\n  Max iterations reached. Proceeding with best-effort plan.")
     return "consolidation"
-    
+
 
 def build_planner_graph():
     """

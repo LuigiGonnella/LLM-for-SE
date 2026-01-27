@@ -7,6 +7,7 @@ from src.core.multi_agent.agents.planner.llm import (
 )
 import json
 
+
 def requirements_engineering_node(state: AgentState) -> AgentState:
     """
     Define comprehensive functional and non-functional requirements.
@@ -55,8 +56,12 @@ Then provide complete requirements in <output> tags as JSON.
             func_count = len(requirements.get("functional", []))
             edge_count = len(requirements.get("edge_cases", []))
             print(f"    Functional Requirements: {func_count}")
-            print(f"    Performance Constraints: {requirements.get('non_functional', {}).get('performance', {})}")
-            print(f"    Security Requirements: {len(requirements.get('non_functional', {}).get('security', []))}")
+            print(
+                f"    Performance Constraints: {requirements.get('non_functional', {}).get('performance', {})}"
+            )
+            print(
+                f"    Security Requirements: {len(requirements.get('non_functional', {}).get('security', []))}"
+            )
             print(f"    Edge Cases Identified: {edge_count}")
 
     except json.JSONDecodeError as e:

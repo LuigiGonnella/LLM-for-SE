@@ -7,6 +7,7 @@ from src.core.multi_agent.agents.planner.llm import (
 )
 import json
 
+
 def quality_review_node(state: AgentState) -> AgentState:
     """
     Review complete PLAN for quality before handoff to coder agent.
@@ -87,10 +88,10 @@ Remember: You are reviewing the PLAN (not code). The coder agent generates code 
         approval_status = quality_review.get("approval_status", "needs_revision")
         completeness = quality_review.get("completeness_score", 0)
         issues = quality_review.get("issues", [])
-        
+
         # Count critical issues
         critical_issues = [i for i in issues if i.get("severity") == "critical"]
-        
+
         # Auto-approve on final iteration to prevent infinite loops
         current_iteration = state.get("iteration_count", 0)
         if current_iteration >= 2:
@@ -113,7 +114,7 @@ Remember: You are reviewing the PLAN (not code). The coder agent generates code 
                     print(f"      - [CRITICAL] {issue.get('description')[:60]}...")
             print(f"    {'✓ APPROVED' if is_approved else '✗ NEEDS REVISION'}")
         state["plan_approved"] = is_approved
-        
+
         # Increment iteration count if not approved
         if not is_approved:
             current_count = state.get("iteration_count", 0)

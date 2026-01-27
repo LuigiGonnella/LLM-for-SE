@@ -7,6 +7,7 @@ from src.core.multi_agent.agents.planner.llm import (
 )
 import json
 
+
 def architecture_design_node(state: AgentState) -> AgentState:
     """
     Design optimal architecture: components, patterns, data structures.
@@ -14,8 +15,12 @@ def architecture_design_node(state: AgentState) -> AgentState:
     print("\n  - PHASE 3: ARCHITECTURE DESIGN")
 
     # Get task context
-    intent_summary = compress_phase_output("intent_analysis", state.get("intent_analysis", {}))
-    requirements_summary = compress_phase_output("requirements", state.get("requirements", {}))
+    intent_summary = compress_phase_output(
+        "intent_analysis", state.get("intent_analysis", {})
+    )
+    requirements_summary = compress_phase_output(
+        "requirements", state.get("requirements", {})
+    )
 
     # Include feedback from quality review if this is a refinement iteration
     feedback_section = ""
@@ -77,7 +82,7 @@ Then provide your architecture in <output> tags as JSON.
 - Optimize for the common case
 - Use standard library where possible
 """
-    
+
     response = call_llm(
         user_prompt=user_prompt,
         system_prompt=ARCHITECTURE_DESIGNER_PROMPT,
@@ -93,7 +98,9 @@ Then provide your architecture in <output> tags as JSON.
             print(f"    Components Designed: {len(components)}")
             for comp in components[:3]:  # Show first 3
                 print(f"      - {comp.get('name')}: {comp.get('responsibility')}")
-            print(f"    Design Patterns: {len(architecture.get('exception_hierarchy', []))}")
+            print(
+                f"    Design Patterns: {len(architecture.get('exception_hierarchy', []))}"
+            )
 
     except json.JSONDecodeError as e:
         print(f"    JSON parse error: {e}")

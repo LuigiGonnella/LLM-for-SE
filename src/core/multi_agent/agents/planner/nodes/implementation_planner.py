@@ -7,6 +7,7 @@ from src.core.multi_agent.agents.planner.llm import (
 )
 import json
 
+
 def implementation_planning_node(state: AgentState) -> AgentState:
     """
     Create detailed step-by-step implementation guidance.
@@ -14,9 +15,15 @@ def implementation_planning_node(state: AgentState) -> AgentState:
     print("\n  - PHASE 4: IMPLEMENTATION PLANNING")
 
     # Get compressed summaries
-    intent_summary = compress_phase_output("intent_analysis", state.get("intent_analysis", {}))
-    requirements_summary = compress_phase_output("requirements", state.get("requirements", {}))
-    architecture_summary = compress_phase_output("architecture", state.get("architecture", {}))
+    intent_summary = compress_phase_output(
+        "intent_analysis", state.get("intent_analysis", {})
+    )
+    requirements_summary = compress_phase_output(
+        "requirements", state.get("requirements", {})
+    )
+    architecture_summary = compress_phase_output(
+        "architecture", state.get("architecture", {})
+    )
 
     user_prompt = f"""## Task: {state.get('task_id', 'N/A')}
 User Request: {state.get('user_request', 'N/A')}

@@ -1,5 +1,6 @@
 from src.core.multi_agent.agents.planner.state import AgentState
 
+
 def consolidation_node(state: AgentState) -> AgentState:
     """
     Consolidate all planning phases into final unified plan.
@@ -22,8 +23,12 @@ def consolidation_node(state: AgentState) -> AgentState:
 
     if state.get("show_node_info"):
         print("    Final plan assembled")
-        print(f"    Components: {len(final_plan.get('architecture', {}).get('components', []))}")
+        print(
+            f"    Components: {len(final_plan.get('architecture', {}).get('components', []))}"
+        )
         print(f"    Iterations: {final_plan.get('iterations', 0)}")
-        print(f"    {'Status: APPROVED' if final_plan.get('approved') else 'Status: BEST EFFORT'}")
+        print(
+            f"    {'Status: APPROVED' if final_plan.get('approved') else 'Status: BEST EFFORT'}"
+        )
 
     return state

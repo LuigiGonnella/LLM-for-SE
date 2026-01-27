@@ -412,6 +412,7 @@ def reverse_string(s: str) -> str:
 """
 )
 
+
 def generate_code(
     *,
     signature: str,
@@ -474,7 +475,9 @@ def generate_code(
     prompt += (
         "CRITICAL OUTPUT FORMAT REQUIREMENTS:\n"
         "1. Your response must be PURE PYTHON CODE ONLY\n"
-        "2. Start immediately with 'def " + signature.split('(')[0].replace('def ', '').strip() + "'\n"
+        "2. Start immediately with 'def "
+        + signature.split("(")[0].replace("def ", "").strip()
+        + "'\n"
         "3. NO explanations, NO markdown, NO text before or after\n"
         "4. NO ```python code blocks - JUST THE RAW FUNCTION\n"
         "5. Complete the entire function implementation\n\n"

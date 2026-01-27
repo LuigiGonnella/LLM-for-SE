@@ -14,55 +14,58 @@ from src.utils.config import config
 # UTILITIES
 # ═══════════════════════════════════════════════════════════════════════
 
+
 def extract_and_parse_json(response: str, max_attempts: int = 3) -> Dict[Any, Any]:
     """
     Extract and parse JSON from LLM response with automatic repair.
     """
     # Combined Approach: Robust brace counting + Regex Fallback + Unescaped Newline Handling
-    
+
     candidates = []
-    
+
     # 1. First priority: Extract from <output> tags if present
     output_match = re.search(r"<output>\s*(.+?)\s*</output>", response, re.DOTALL)
     if output_match:
         candidates.append(output_match.group(1).strip())
-    
+
     # 2. Clean thinking blocks for subsequent parsing
-    clean_text = re.sub(r"<thinking>.*?</thinking>", "", response, flags=re.DOTALL).strip()
-    
+    clean_text = re.sub(
+        r"<thinking>.*?</thinking>", "", response, flags=re.DOTALL
+    ).strip()
+
     # 3. Heuristic: Brace Counting
     # Find all top-level {} blocks in the cleaned text, or original text if clean failed
     target_text = clean_text if clean_text else response
-    
+
     brace_count = 0
     start_index = -1
     in_string = False
     escape = False
-    
+
     for i, char in enumerate(target_text):
         if char == '"' and not escape:
             in_string = not in_string
-        elif char == '\\' and in_string:
+        elif char == "\\" and in_string:
             escape = not escape
         elif not in_string:
-            if char == '{':
+            if char == "{":
                 if brace_count == 0:
                     start_index = i
                 brace_count += 1
-            elif char == '}':
+            elif char == "}":
                 brace_count -= 1
                 if brace_count == 0 and start_index != -1:
                     candidates.append(target_text[start_index : i + 1])
                     start_index = -1
-        
-        if char != '\\':
+
+        if char != "\\":
             escape = False
-    
+
     # 4. Add code block candidates as fallback
     code_match = re.search(r"```(?:json)?\s*(.+?)\s*```", response, re.DOTALL)
     if code_match:
         candidates.append(code_match.group(1).strip())
-    
+
     # 5. Try to find any JSON-like structure after common markers
     json_markers = [
         r"(?:Output|Result|Response):\s*(\{.+\})",
@@ -72,7 +75,7 @@ def extract_and_parse_json(response: str, max_attempts: int = 3) -> Dict[Any, An
         marker_match = re.search(pattern, target_text, re.DOTALL | re.MULTILINE)
         if marker_match:
             candidates.append(marker_match.group(1).strip())
-        
+
     # Process all candidates (output tag first, then brace-counted, then others)
     # Remove duplicates while preserving order
     seen = set()
@@ -81,34 +84,34 @@ def extract_and_parse_json(response: str, max_attempts: int = 3) -> Dict[Any, An
         if c and c not in seen:
             all_candidates.append(c)
             seen.add(c)
-    
+
     for json_str in all_candidates:
-        if not json_str: 
+        if not json_str:
             continue
-            
+
         # Clean common issues
         json_str = json_str.strip()
-        
+
         # Remove markdown formatting if present
         json_str = re.sub(r"^```(?:json)?\s*", "", json_str)
         json_str = re.sub(r"\s*```$", "", json_str)
-        
+
         # Remove trailing commas
         json_str = re.sub(r",\s*([}\]])", r"\1", json_str)
-        
+
         try:
             return json.loads(json_str, strict=False)
         except json.JSONDecodeError:
             # Try fixing unescaped newlines
             try:
-                fixed_str = json_str.replace('\n', '\\n')
+                fixed_str = json_str.replace("\n", "\\n")
                 return json.loads(fixed_str, strict=False)
             except json.JSONDecodeError:
                 # Try with more aggressive cleaning
                 try:
                     # Remove comments
-                    cleaned = re.sub(r'//.*?$', '', json_str, flags=re.MULTILINE)
-                    cleaned = re.sub(r'/\*.*?\*/', '', cleaned, flags=re.DOTALL)
+                    cleaned = re.sub(r"//.*?$", "", json_str, flags=re.MULTILINE)
+                    cleaned = re.sub(r"/\*.*?\*/", "", cleaned, flags=re.DOTALL)
                     return json.loads(cleaned, strict=False)
                 except json.JSONDecodeError:
                     continue
@@ -118,23 +121,25 @@ def extract_and_parse_json(response: str, max_attempts: int = 3) -> Dict[Any, An
         return json.loads(clean_text.strip(), strict=False)
     except json.JSONDecodeError:
         pass
-    
+
     # Last resort: Try to extract anything that looks like JSON from the raw response
     # Look for largest {...} block even if malformed
-    all_braces = re.findall(r'\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}', response, re.DOTALL)
+    all_braces = re.findall(r"\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}", response, re.DOTALL)
     for attempt in all_braces:
         try:
-            cleaned = re.sub(r',\s*([}\]])', r'\1', attempt)
+            cleaned = re.sub(r",\s*([}\]])", r"\1", attempt)
             return json.loads(cleaned, strict=False)
         except json.JSONDecodeError:
             continue
 
     # All attempts failed - provide helpful error
-    if '<thinking>' in response and '<output>' not in response:
+    if "<thinking>" in response and "<output>" not in response:
         error_msg = "Model produced <thinking> but forgot <output> tags. No JSON found."
     else:
-        error_msg = f"Failed to parse JSON after attempting {len(all_candidates)} extractions."
-    
+        error_msg = (
+            f"Failed to parse JSON after attempting {len(all_candidates)} extractions."
+        )
+
     raise json.JSONDecodeError(
         f"{error_msg} Response preview: {response[:500]}...",
         response,

@@ -1,9 +1,10 @@
 from src.core.multi_agent.agents.critic.state import CriticAgentState
 
+
 def input_validator_node(state: CriticAgentState) -> CriticAgentState:
     """
     Validate input state before processing.
-    
+
     Checks:
     - Code presence
     - Plan presence
@@ -14,10 +15,10 @@ def input_validator_node(state: CriticAgentState) -> CriticAgentState:
 
     if not state.get("code"):
         validation_errors.append("Code is required for critique")
-    
+
     if not state.get("plan"):
         validation_errors.append("Plan is required for critique")
-        
+
     if not state.get("signature"):
         validation_errors.append("Signature is required for critique")
 

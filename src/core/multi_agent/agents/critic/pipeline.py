@@ -10,10 +10,18 @@ Architecture:
 
 from langgraph.graph import StateGraph, START, END
 from src.core.multi_agent.agents.critic.state import CriticAgentState
-from src.core.multi_agent.agents.critic.nodes.input_validator import input_validator_node
-from src.core.multi_agent.agents.critic.nodes.correctness_analyzer import correctness_analyzer_node
-from src.core.multi_agent.agents.critic.nodes.quality_reviewer import quality_reviewer_node
-from src.core.multi_agent.agents.critic.nodes.feedback_synthesizer import feedback_synthesizer_node
+from src.core.multi_agent.agents.critic.nodes.input_validator import (
+    input_validator_node,
+)
+from src.core.multi_agent.agents.critic.nodes.correctness_analyzer import (
+    correctness_analyzer_node,
+)
+from src.core.multi_agent.agents.critic.nodes.quality_reviewer import (
+    quality_reviewer_node,
+)
+from src.core.multi_agent.agents.critic.nodes.feedback_synthesizer import (
+    feedback_synthesizer_node,
+)
 
 
 def build_critic_graph():

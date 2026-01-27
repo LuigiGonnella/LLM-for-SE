@@ -18,7 +18,9 @@ Flow:
 from langgraph.graph import StateGraph, START, END
 from src.core.multi_agent.agents.coder.state import CoderAgentState
 from src.core.multi_agent.agents.coder.nodes.input_validator import input_validator_node
-from src.core.multi_agent.agents.coder.nodes.edge_case_analyzer import edge_case_analyzer_node
+from src.core.multi_agent.agents.coder.nodes.edge_case_analyzer import (
+    edge_case_analyzer_node,
+)
 from src.core.multi_agent.agents.coder.nodes.cot_generator import cot_generator_node
 from src.core.multi_agent.agents.coder.nodes.code_generator import code_generator_node
 from src.core.multi_agent.agents.coder.nodes.code_validator import code_validator_node
@@ -45,8 +47,12 @@ def consolidation_node(state: CoderAgentState) -> CoderAgentState:
         else:
             print("      No code generated - debugging info:")
             print(f"       raw_code: {'✓' if state.get('raw_code') else '✗'}")
-            print(f"       validated_code: {'✓' if state.get('validated_code') else '✗'}")
-            print(f"       optimized_code: {'✓' if state.get('optimized_code') else '✗'}")
+            print(
+                f"       validated_code: {'✓' if state.get('validated_code') else '✗'}"
+            )
+            print(
+                f"       optimized_code: {'✓' if state.get('optimized_code') else '✗'}"
+            )
             if state.get("errors"):
                 print(f"       Errors: {len(state['errors'])}")
                 for err in state["errors"][:5]:

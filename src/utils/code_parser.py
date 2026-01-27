@@ -79,10 +79,14 @@ def extract_python_code(llm_output: str) -> Optional[str]:
     # Pattern 2b: ``` ... ``` (generic code block, no newline - code starts on same line)
     generic_block_inline = re.findall(r"```([^\n`].*?)```", llm_output, re.DOTALL)
     candidates.extend(generic_block_inline)
-    
+
     # Pattern 3: Find code between "def" and end of response (greedy)
     # This handles cases where code is followed by explanations
-    def_matches = re.findall(r"(def\s+\w+\s*\([^)]*\)[^:]*:.*?)(?=\n\n[A-Z]|\n\nNote:|\n\n#|\Z)", llm_output, re.DOTALL)
+    def_matches = re.findall(
+        r"(def\s+\w+\s*\([^)]*\)[^:]*:.*?)(?=\n\n[A-Z]|\n\nNote:|\n\n#|\Z)",
+        llm_output,
+        re.DOTALL,
+    )
     candidates.extend(def_matches)
 
     # Pattern 4: No markdown, look for def/class as code start (allowing leading whitespace)
@@ -90,11 +94,13 @@ def extract_python_code(llm_output: str) -> Optional[str]:
     code_start = re.search(r"^\s*(def |class )", llm_output, re.MULTILINE)
     if code_start:
         # Extract until double newline or end of string
-        remaining_text = llm_output[code_start.start():].strip()
+        remaining_text = llm_output[code_start.start() :].strip()
         # Try to find natural ending (double newline before text that looks like prose)
-        end_match = re.search(r"\n\n(?=[A-Z][a-z]+:|\*\*|Note|Explanation)", remaining_text)
+        end_match = re.search(
+            r"\n\n(?=[A-Z][a-z]+:|\*\*|Note|Explanation)", remaining_text
+        )
         if end_match:
-            candidates.append(remaining_text[:end_match.start()].strip())
+            candidates.append(remaining_text[: end_match.start()].strip())
         else:
             candidates.append(remaining_text)
 

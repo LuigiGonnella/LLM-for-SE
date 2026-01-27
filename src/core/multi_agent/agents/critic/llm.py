@@ -23,7 +23,9 @@ REVIEW PRINCIPLES:
 # CORRECTNESS ANALYZER
 # ═══════════════════════════════════════════════════════════════════════
 
-CORRECTNESS_SYSTEM_PROMPT = BASE_CRITIC_PROMPT + """
+CORRECTNESS_SYSTEM_PROMPT = (
+    BASE_CRITIC_PROMPT
+    + """
 Your specific role is the **Correctness Analyzer**.
 
 YOUR TASK:
@@ -62,6 +64,8 @@ Provide a structured analysis:
 
 If execution failed, this is an AUTOMATIC FAILED status.
 """
+)
+
 
 def analyze_correctness(
     *,
@@ -103,7 +107,9 @@ Analyze the functional correctness and constraint compliance of the code.
 # QUALITY REVIEWER
 # ═══════════════════════════════════════════════════════════════════════
 
-QUALITY_SYSTEM_PROMPT = BASE_CRITIC_PROMPT + """
+QUALITY_SYSTEM_PROMPT = (
+    BASE_CRITIC_PROMPT
+    + """
 Your specific role is the **Code Quality Expert**.
 
 YOUR TASK:
@@ -141,6 +147,8 @@ Provide a structured analysis:
 - MAINTAINABILITY_STATUS: [ACCEPTABLE / NEEDS_REFACTORING]
 - ISSUES: List specific style/complexity issues with suggested fixes.
 """
+)
+
 
 def analyze_quality(
     *,
@@ -172,7 +180,9 @@ Analyze the code quality, complexity, and maintainability.
 # FEEDBACK SYNTHESIZER
 # ═══════════════════════════════════════════════════════════════════════
 
-SYNTHESIZER_SYSTEM_PROMPT = BASE_CRITIC_PROMPT + """
+SYNTHESIZER_SYSTEM_PROMPT = (
+    BASE_CRITIC_PROMPT
+    + """
 Your specific role is the **Lead Critic**.
 Synthesize the analysis from the Correctness and Quality experts into a final, actionable critique for the Coder agent.
 
@@ -205,6 +215,8 @@ FORMAT:
 4. DO NOT reference specific line numbers or "previous code", as the Coder generates code from scratch.
 5. Focus on WHAT the code should do, not just what was wrong.
 """
+)
+
 
 def synthesize_feedback(
     *,
