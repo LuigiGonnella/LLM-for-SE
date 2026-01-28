@@ -38,7 +38,12 @@
   \usepackage[switch,mathlines]{lineno}
 
   % Line numbers in gray Helvetica 8pt
+\IfFileExists{phvb.tfm}{%
   \font\aclhv = phvb at 8pt
+}{%
+  % Fallback to Computer Modern Sans Bold if Helvetica isn't available.
+  \font\aclhv = cmssbx10 at 8pt
+}
   \renewcommand\linenumberfont{\aclhv\color{lightgray}}
 
   % Zero-fill line numbers

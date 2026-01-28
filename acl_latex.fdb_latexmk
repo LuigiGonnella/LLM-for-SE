@@ -1,0 +1,16 @@
+# Fdb version 4
+["pdflatex"] 1769626944.54395 "report/latex/acl_latex.tex" "acl_latex.pdf" "acl_latex" 1769626944.60491 2
+  "/usr/local/texlive/2025basic/texmf-dist/fonts/tfm/public/cm/cmr10.tfm" 1136768653 1296 45809c5a464d5f32c8f98ba97c1bb47f ""
+  "/usr/local/texlive/2025basic/texmf-dist/tex/latex/base/article.cls" 1748806692 20144 b966087dda3b194755eb460d32e2ef75 ""
+  "/usr/local/texlive/2025basic/texmf-dist/tex/latex/base/size11.clo" 1748806692 8464 f339f4d5391fbe0425b2d94c90e6819e ""
+  "/usr/local/texlive/2025basic/texmf-dist/web2c/texmf.cnf" 1749313668 42213 4e2ca030e8e2640502016e9e45868dcb ""
+  "/usr/local/texlive/2025basic/texmf-var/web2c/pdftex/pdflatex.fmt" 1769618876 2966381 54ca0cad0e2ecf5e07d0155351ea01c2 ""
+  "/usr/local/texlive/2025basic/texmf.cnf" 1741448314 628 81d1ada0f601fb1ffa62f1323192d946 ""
+  "acl.sty" 0 -1 0 ""
+  "acl_latex.aux" 1769626936.54334 32 3985256e7290058c681f74d7a3565a19 "pdflatex"
+  "report/latex/acl_latex.tex" 1769626793.04921 15142 5be13cce87271e295e9785b7aeb653c8 ""
+  (generated)
+  "acl_latex.aux"
+  "acl_latex.log"
+  "acl_latex.pdf"
+  (rewritten before read)

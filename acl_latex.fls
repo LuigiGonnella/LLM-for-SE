@@ -1,0 +1,12 @@
+PWD /Users/kgun/Documents/Polito/LLMs/project/single_agent_system
+INPUT /usr/local/texlive/2025basic/texmf.cnf
+INPUT /usr/local/texlive/2025basic/texmf-dist/web2c/texmf.cnf
+INPUT /usr/local/texlive/2025basic/texmf-var/web2c/pdftex/pdflatex.fmt
+INPUT report/latex/acl_latex.tex
+OUTPUT acl_latex.log
+INPUT /usr/local/texlive/2025basic/texmf-dist/tex/latex/base/article.cls
+INPUT /usr/local/texlive/2025basic/texmf-dist/tex/latex/base/article.cls
+INPUT /usr/local/texlive/2025basic/texmf-dist/tex/latex/base/size11.clo
+INPUT /usr/local/texlive/2025basic/texmf-dist/tex/latex/base/size11.clo
+INPUT /usr/local/texlive/2025basic/texmf-dist/tex/latex/base/size11.clo
+INPUT /usr/local/texlive/2025basic/texmf-dist/fonts/tfm/public/cm/cmr10.tfm

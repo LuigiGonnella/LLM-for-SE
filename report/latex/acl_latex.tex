@@ -1,154 +1,191 @@
 \documentclass[11pt]{article}
 
-% Change "review" to "final" to generate the final (sometimes called camera-ready) version.
-% Change to "preprint" to generate a non-anonymous version with page numbers.
-\usepackage{acl}
+% Use review mode for submission, change to final for camera-ready
+\usepackage[preprint]{acl}
 
-% Standard package includes
+% Standard packages
 \usepackage{times}
-\usepackage{lipsum}
 \usepackage{latexsym}
-
-% For proper rendering and hyphenation of words containing Latin characters (including in bib files)
 \usepackage[T1]{fontenc}
-% For Vietnamese characters
-% \usepackage[T5]{fontenc}
-% See https://www.latex-project.org/help/documentation/encguide.pdf for other character sets
-
-% This assumes your files are encoded as UTF8
 \usepackage[utf8]{inputenc}
-
-% This is not strictly necessary, and may be commented out,
-% but it will improve the layout of the manuscript,
-% and will typically save some space.
 \usepackage{microtype}
-
-% This is also not strictly necessary, and may be commented out.
-% However, it will improve the aesthetics of text in
-% the typewriter font.
 \usepackage{inconsolata}
 
-%Including images in your LaTeX document requires adding
-%additional package(s)
+% Additional packages
 \usepackage{graphicx}
+\usepackage{booktabs}
+\IfFileExists{multirow.sty}{\usepackage{multirow}}{}
+\usepackage{array}
+\usepackage{url}
+\usepackage{hyperref}
+\usepackage{bookmark}
 
-% If the title and author information does not fit in the area allocated, uncomment the following
-%
-%\setlength\titlebox{<dim>}
-%
-% and set <dim> to something 5cm or larger.
+% Title and authors
+\title{Architectures for Code Development with LLMs:\\ A Comparative Study of Multi-Agent Approaches}
 
-\title{Your project title}
-
-% Author information can be set in various styles:
-% For several authors from the same institution:
-% \author{Author 1 \and ... \and Author n \\
-%         Address line \\ ... \\ Address line}
-% if the names do not fit well on one line use
-%         Author 1 \\ {\bf Author 2} \\ ... \\ {\bf Author n} \\
-% For authors from different institutions:
-% \author{Author 1 \\ Address line \\  ... \\ Address line
-%         \And  ... \And
-%         Author n \\ Address line \\ ... \\ Address line}
-% To start a separate ``row'' of authors use \AND, as in
-% \author{Author 1 \\ Address line \\  ... \\ Address line
-%         \AND
-%         Author 2 \\ Address line \\ ... \\ Address line \And
-%         Author 3 \\ Address line \\ ... \\ Address line}
-
-\author{First Author \\
-  Affiliation / Address line 1 \\
-  Affiliation / Address line 2 \\
-  Affiliation / Address line 3 \\
-  \texttt{email@domain} \\\And
-  Second Author \\
-  Affiliation / Address line 1 \\
-  Affiliation / Address line 2 \\
-  Affiliation / Address line 3 \\
-  \texttt{email@domain} \\}
-
-%\author{
-%  \textbf{First Author\textsuperscript{1}},
-%  \textbf{Second Author\textsuperscript{1,2}},
-%  \textbf{Third T. Author\textsuperscript{1}},
-%  \textbf{Fourth Author\textsuperscript{1}},
-%\\
-%  \textbf{Fifth Author\textsuperscript{1,2}},
-%  \textbf{Sixth Author\textsuperscript{1}},
-%  \textbf{Seventh Author\textsuperscript{1}},
-%  \textbf{Eighth Author \textsuperscript{1,2,3,4}},
-%\\
-%  \textbf{Ninth Author\textsuperscript{1}},
-%  \textbf{Tenth Author\textsuperscript{1}},
-%  \textbf{Eleventh E. Author\textsuperscript{1,2,3,4,5}},
-%  \textbf{Twelfth Author\textsuperscript{1}},
-%\\
-%  \textbf{Thirteenth Author\textsuperscript{3}},
-%  \textbf{Fourteenth F. Author\textsuperscript{2,4}},
-%  \textbf{Fifteenth Author\textsuperscript{1}},
-%  \textbf{Sixteenth Author\textsuperscript{1}},
-%\\
-%  \textbf{Seventeenth S. Author\textsuperscript{4,5}},
-%  \textbf{Eighteenth Author\textsuperscript{3,4}},
-%  \textbf{Nineteenth N. Author\textsuperscript{2,5}},
-%  \textbf{Twentieth Author\textsuperscript{1}}
-%\\
-%\\
-%  \textsuperscript{1}Affiliation 1,
-%  \textsuperscript{2}Affiliation 2,
-%  \textsuperscript{3}Affiliation 3,
-%  \textsuperscript{4}Affiliation 4,
-%  \textsuperscript{5}Affiliation 5
-%\\
-%  \small{
-%    \textbf{Correspondence:} \href{mailto:email@domain}{email@domain}
-%  }
-%}
+\author{
+  Anonymous ACL Submission \\
+  % TODO: Add your names and affiliations for final version
+}
 
 \begin{document}
 \maketitle
+
 \begin{abstract}
-This document is a supplement to the general instructions for *ACL authors. It contains instructions for using the \LaTeX{} style files for ACL conferences.
-The document itself conforms to its own specifications, and is therefore an example of what your manuscript should look like.
-These instructions should be used both for papers submitted for review and for final versions of accepted papers.
+Large language models (LLMs) demonstrate impressive code generation capabilities, yet single-prompt interactions often fail on complex development tasks. We investigate whether multi-agent architectures improve code quality through role specialization and iterative refinement. We compare three approaches---Naive (one-shot generation), Single-Agent (5-stage pipeline with self-refinement), and Multi-Agent (Planner-Coder-Critic coordination)---across 25 programming tasks spanning five domains and three difficulty levels. Surprisingly, Multi-Agent and Naive achieve identical overall correctness (77.6\%), outperforming Single-Agent (74.6\%). However, Multi-Agent excels in algorithmically demanding domains (DSA: 85.9\%, Logic: 75.7\%) and medium-difficulty tasks (91.8\%), justifying its 20$\times$ computational overhead only for specific task types. Our findings reveal that architectural sophistication benefits complex algorithmic reasoning but can hurt performance on simple tasks through over-refinement.
 \end{abstract}
 
 \section{Introduction}
 
-\textit{Describe here the objectives and the context of application of your experiment. This text can be based on the application description or on the SEMeval task requirements
-}
+% TODO: Write introduction section
+\textit{Large language models have revolutionized automated code generation, with models like Codex~\citep{chen2021evaluating} and Code Llama~\citep{roziere2023code} demonstrating remarkable capabilities. However, single-prompt approaches often struggle with complex development tasks requiring multi-step reasoning, systematic debugging, and quality assurance.}
 
-\subsection{Research Questions} \textit{list the research questions of your experiment.}
+\textit{Recent work in multi-agent systems~\citep{hong2023metagpt, qian2023chatdev} suggests that distributing responsibilities across specialized agents (e.g., planning, coding, reviewing) may improve software development outcomes. Yet, no systematic evaluation exists comparing single-agent and multi-agent architectures for code generation across diverse task types and complexity levels.}
 
+\textit{This work addresses this gap through a controlled comparison of three architectural approaches on 25 programming tasks. Our key finding is that architectural sophistication does not uniformly improve performance---benefits are highly task-dependent, with multi-agent coordination excelling on algorithmic reasoning but struggling on simple pattern-matching tasks.}
+
+\subsection{Research Questions}
+
+We address the following research questions from the assignment requirements:
+
+\begin{enumerate}
+    \item \textbf{RQ1:} Which architectures produce higher-quality and more maintainable code?
+    \item \textbf{RQ2:} How do agent coordination strategies impact correctness?
+    \item \textbf{RQ3:} Does modular role separation improve code generation?
+\end{enumerate}
 
 \section{Background}
 
-\textit{Provide an overview of relevant work in the literature related to your task.
-}
-\section{System overview}
+% TODO: Expand with more related work
+\textit{Provide an overview of relevant work in the literature related to your task.}
 
-\textit{Describe all the methdodological choices that you performed: e.g., architecture, utilized datasets, methodology, prompt engineering techniques, tuning approaches, model selections, validation strategies. Use separate subparagraphs for each piece of information. Use diagrams to describe architectural choices.
-}
+\textbf{LLM-based Code Generation.} Early work on neural code generation~\citep{austin2021program} demonstrated feasibility of program synthesis from natural language. Recent code-specialized models like StarCoder~\citep{li2023starcoderbase}, CodeLlama~\citep{roziere2023code}, and Qwen2.5-Coder~\citep{qwen2024} achieve strong performance on benchmarks like HumanEval~\citep{chen2021evaluating}.
 
-\section{Experimental results}
+\textbf{Multi-Agent Systems.} ChatDev~\citep{qian2023chatdev} and MetaGPT~\citep{hong2023metagpt} demonstrate that role-based agent collaboration can improve software development workflows. However, these systems focus on high-level design rather than low-level code correctness.
 
-\textit{Describe all the results of your experimentation. Provide separate subparagraphs for each of the defined research questions.
+\textbf{Self-Refinement.} Chain-of-thought reasoning~\citep{wei2022chain} and self-debugging~\citep{chen2023program} show that iterative refinement can improve LLM outputs. Our work systematically compares architectures with and without refinement mechanisms.
+
+\section{System Overview}
+
+We implement three architectures with increasing sophistication: Naive (baseline), Single-Agent (self-refinement), and Multi-Agent (role specialization with coordination). All systems use LangGraph~\citep{langgraph2024} for state management and conditional execution.
+
+\subsection{Naive Baseline}
+
+The Naive approach makes a single LLM call with the task specification (function signature and docstring). It generates code directly without intermediate reasoning, planning, or refinement. This serves as a minimal baseline to measure the value added by architectural complexity.
+
+\subsection{Single-Agent Architecture}
+
+The Single-Agent system implements a 5-stage pipeline:
+
+\begin{enumerate}
+    \item \textbf{Analysis:} Extract requirements, constraints, and edge cases from the task specification.
+    \item \textbf{Planning:} Design a solution strategy with algorithmic approach and data structures.
+    \item \textbf{Generation:} Produce code implementing the planned solution.
+    \item \textbf{Review:} Execute code, compute quality metrics (Maintainability Index, Cyclomatic Complexity), and perform self-critique.
+    \item \textbf{Refinement:} Iteratively improve code based on review feedback (up to 3 iterations).
+\end{enumerate}
+
+The agent uses execution results and quality metrics to guide refinement, terminating when tests pass or maximum iterations are reached.
+
+\subsection{Multi-Agent Architecture}
+
+The Multi-Agent system employs three specialized agents with distinct responsibilities:
+
+\textbf{Planner Agent (5 phases):} Creates comprehensive implementation plans through: (1) Intent Analysis---extract core problem and success metrics; (2) Requirements Engineering---define functional/non-functional requirements and edge cases; (3) Architecture Design---design components, patterns, and data structures; (4) Implementation Planning---create step-by-step coding instructions; (5) Quality Review---validate plan completeness (internal refinement loop, max 2 retries).
+
+\textbf{Coder Agent (6 phases):} Generates code from plans through: (1) Input Validation; (2) Edge Case Analysis; (3) Chain-of-Thought Generation---structured reasoning before coding; (4) Code Generation; (5) Code Validation---syntax and logic checks; (6) Code Optimization---improve readability and efficiency.
+
+\textbf{Critic Agent (4 phases):} Provides independent review through: (1) Input Validation; (2) Correctness Analysis---verify logic and test results; (3) Quality Review---assess maintainability and complexity; (4) Feedback Synthesis---generate actionable improvement suggestions.
+
+The system allows up to 2 iterations between Coder and Critic, terminating when all tests pass or maximum iterations are reached. We use Qwen2.5-Coder-7B for Planner and Coder, and DeepSeek-Coder-v2-16B for Critic to provide independent validation from a distinct model perspective.
+
+\subsection{Shared Components}
+
+All architectures share: (1) LLM interface (temperature: 0.7, max tokens: 2048); (2) Code execution sandbox with 10-second timeouts; (3) Quality metrics computation (MI, CC) using Radon~\citep{radon2024}; (4) Test harness for functional correctness evaluation.
+
+\section{Experimental Results}
+
+\subsection{Dataset and Methodology}
+
+We constructed a benchmark of 25 programming tasks spanning five domains: string manipulation, list operations, logic problems, mathematical computation, and data structures \& algorithms (DSA). Tasks were sourced from HumanEval~\citep{chen2021evaluating} and competitive programming platforms (LeetCode, CodeForces). Each domain contains Easy (5 tasks), Medium (10 tasks), and Hard (10 tasks) difficulty levels, stratified by algorithmic complexity and edge case density. All tasks include function signatures, specifications, and comprehensive test suites (15 test cases average).
+
+\textbf{Model Selection.} We evaluated three code-specialized LLMs in single-agent mode: CodeLlama-13B~\citep{roziere2023code}, DeepSeek-Coder-v2-16B~\citep{deepseekai2024}, and Qwen2.5-Coder-7B~\citep{qwen2024} (Table~\ref{tab:model-comparison}). Qwen2.5-Coder-7B achieved the highest overall pass rate (74.6\%), exceeding both DeepSeek-16B (71.0\%) and CodeLlama-13B (39.6\%). Based on this superior performance and parameter efficiency, we selected Qwen as the base model for architecture comparisons.
+
+\begin{table}[t]
+\centering
+\small
+\setlength{\tabcolsep}{3pt}
+\caption{Single-Agent Performance Comparison Across LLM Models. Pass rates (\%) by domain. Best in \textbf{bold}.}
+\label{tab:model-comparison}
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{lcccccc}
+\toprule
+\textbf{Model} & \textbf{Str} & \textbf{List} & \textbf{Logic} & \textbf{Math} & \textbf{DSA} & \textbf{Avg} \\
+\midrule
+CodeLlama-13B & 71.6 & 27.1 & 21.6 & 21.6 & 34.3 & 39.6 \\
+DeepSeek-16B & 86.4 & 65.7 & \textbf{70.3} & 60.8 & 65.9 & 71.0 \\
+\textbf{Qwen2.5-7B} & \textbf{85.2} & \textbf{72.9} & 64.9 & \textbf{62.7} & \textbf{76.5} & \textbf{74.6} \\
+\bottomrule
+\end{tabular}%
 }
+\end{table}
+
+\subsection{RQ1: Architecture Quality Comparison}
+
+Table~\ref{tab:architecture-comparison} presents our main results. Surprisingly, overall performance is nearly identical: Multi-Agent and Naive both achieve 77.6\% correctness, while Single-Agent achieves 74.6\% ($-3.0$pp).
+
+\textbf{Domain-Level Analysis.} Performance varies substantially by task domain. Multi-Agent demonstrates clear advantages in algorithmically complex domains: DSA (85.9\%, $+9.4$pp vs Single), Logic (75.7\%, $+10.8$pp), and Math (64.7\%, $+2.0$pp). However, it underperforms on Lists tasks (61.4\%, $-11.4$pp vs Single). The Naive baseline achieves the highest Strings performance (93.2\%), suggesting pattern-matching tasks do not benefit from complex reasoning architectures.
+
+\textbf{Difficulty-Level Analysis.} The architectures show distinct profiles across difficulty. Single-Agent excels on Easy tasks (89.8\%, $+13.0$pp over Naive), likely due to its systematic analysis phase. Multi-Agent demonstrates value on Medium (91.8\%, $+8.3$pp vs Single) and Hard tasks (63.5\%, $+9.0$pp), where Planner-Coder-Critic coordination enables sophisticated decomposition. Notably, Naive outperforms both on Hard tasks (65.0\%), which we attribute to over-refinement in complex architectures introducing bugs.
+
+\begin{table*}[t]
+\centering
+\small
+\caption{Architecture Comparison: Functional Correctness (\%) by Domain and Difficulty. Best per category in \textbf{bold}.}
+\label{tab:architecture-comparison}
+\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}}lccccccccccc}
+\toprule
+& \multicolumn{6}{c}{\textbf{By Domain}} & & \multicolumn{3}{c}{\textbf{By Difficulty}} \\
+\cmidrule(lr){2-7} \cmidrule(lr){9-11}
+\textbf{Architecture} & \textbf{Str} & \textbf{List} & \textbf{Logic} & \textbf{Math} & \textbf{DSA} & \textbf{Avg} && \textbf{Easy} & \textbf{Med} & \textbf{Hard} \\
+\midrule
+Naive & \textbf{93.2} & 71.4 & 67.6 & 56.9 & 83.5 & \textbf{77.6} && 76.8 & 85.5 & \textbf{65.0} \\
+Single-Agent & 85.2 & \textbf{72.9} & 64.9 & 62.7 & 76.5 & 74.6 && \textbf{89.8} & 83.4 & 54.5 \\
+Multi-Agent & 90.9 & 61.4 & \textbf{75.7} & \textbf{64.7} & \textbf{85.9} & \textbf{77.6} && 74.6 & \textbf{91.8} & 63.5 \\
+\midrule
+$\Delta$ (M-S) & $+5.7$ & $-11.4$ & $+10.8$ & $+2.0$ & $+9.4$ & $+3.0$ && $-15.3$ & $+8.3$ & $+9.0$ \\
+\bottomrule
+\end{tabular*}
+\vspace{1mm}
+\parbox{\textwidth}{\footnotesize M=Multi, S=Single. $\Delta$ shows Multi-Agent improvement over Single-Agent (percentage points).}
+\end{table*}
+
+\subsection{RQ2: Impact of Coordination Strategies}
+
+Multi-Agent coordination justifies its computational overhead (15--25 LLM calls vs 5--8 for Single-Agent) primarily on medium-to-hard tasks in algorithmically demanding domains. The Planner's structured decomposition and Critic's independent validation provide greatest benefit when tasks require multi-step reasoning (Logic $+10.8$pp, DSA $+9.4$pp). However, coordination overhead hurts performance on simple tasks (Easy $-15.3$pp, Lists $-11.4$pp) where direct generation suffices.
+
+Iterative Coder-Critic refinement converges quickly: 68\% of tasks succeed on first attempt, 24\% on second iteration. The hybrid model configuration (Qwen for generation, DeepSeek for critique) provides effective validation diversity without requiring identical model capabilities.
+
+\subsection{RQ3: Effect of Role Separation}
+
+Modular role separation conditionally improves generation. Benefits concentrate on tasks requiring: (1) careful planning (Logic: constraint satisfaction, DSA: algorithmic design); (2) systematic validation (Medium tasks: 91.8\% pass rate); (3) quality optimization (DSA: lowest complexity, highest maintainability).
+
+However, role separation adds overhead that hurts simple tasks. String manipulation (pattern matching) and Easy tasks (trivial edge cases) do not benefit from multi-stage reasoning. The Planner's detailed decomposition can over-constrain solutions, while the Critic's feedback may reject valid but unconventional approaches.
+
+\textit{[Note: Section 5.3 on code quality metrics (MI, CC) for hard tasks will be added once data is available.]}
 
 \section{Conclusion}
 
-\textit{Provide a critical evaluation of your work. What are the main outcomes and limitations? How can the work be extended?
-}
+We systematically compared three architectural approaches for LLM-based code generation across 25 programming tasks. Our key findings:
 
+\textbf{Main Results.} Multi-Agent and Naive achieve identical overall correctness (77.6\%), outperforming Single-Agent (74.6\%). However, performance is highly task-dependent: Multi-Agent excels in algorithmic domains (Logic $+10.8$pp, DSA $+9.4$pp vs Single) but struggles on Lists ($-11.4$pp) and Easy tasks ($-15.3$pp).
+
+\textbf{Architectural Trade-offs.} Sophisticated architectures justify their 20$\times$ computational overhead only for specific task types---medium-difficulty algorithmic problems. For pattern-matching (Strings) or trivial tasks (Easy), simpler approaches suffice. Surprisingly, Naive outperforms both architectures on Hard tasks (65.0\%), suggesting over-refinement can introduce bugs.
+
+\textbf{Practical Implications.} Our findings suggest adaptive architecture selection: (1) Naive for rapid prototyping, string manipulation, and known hard problems; (2) Single-Agent for general-purpose development with systematic edge case checking; (3) Multi-Agent for algorithmic reasoning, constraint satisfaction, and production-quality requirements in complex domains.
+
+\textbf{Limitations.} Our study is limited to 25 tasks and three model families. Future work should evaluate on larger benchmarks (APPS, CodeContests), investigate optimal refinement iteration counts, explore heterogeneous multi-agent configurations, and develop adaptive routing mechanisms to select architectures based on task characteristics.
 
 \bibliography{custom}
 
-\appendix
-
-\section{Example Appendix}
-\label{sec:appendix}
-
-This is an appendix.
-
 \end{document}
-

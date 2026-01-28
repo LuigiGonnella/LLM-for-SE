@@ -1,0 +1,85 @@
+\begin{thebibliography}{12}
+\providecommand{\natexlab}[1]{#1}
+
+\bibitem[{Austin et~al.(2021)Austin, Odena, Nye, Bosma, Michalewski, Dohan,
+  Jiang, Cai, Terry, Le et~al.}]{austin2021program}
+Jacob Austin, Augustus Odena, Maxwell Nye, Maarten Bosma, Henryk Michalewski,
+  David Dohan, Ellen Jiang, Carrie Cai, Michael Terry, Quoc Le, and 1 others.
+  2021.
+\newblock Program synthesis with large language models.
+\newblock \emph{arXiv preprint arXiv:2108.07732}.
+
+\bibitem[{Campagna(2024)}]{radon2024}
+Michele Campagna. 2024.
+\newblock Radon: A python tool to compute code metrics.
+\newblock \url{https://radon.readthedocs.io/}.
+
+\bibitem[{Chen et~al.(2021)Chen, Tworek, Jun, Yuan, Pinto, Kaplan, Edwards,
+  Burda, Joseph, Brockman et~al.}]{chen2021evaluating}
+Mark Chen, Jerry Tworek, Heewoo Jun, Qiming Yuan, Henrique Ponde de~Oliveira
+  Pinto, Jared Kaplan, Harri Edwards, Yuri Burda, Nicholas Joseph, Greg
+  Brockman, and 1 others. 2021.
+\newblock Evaluating large language models trained on code.
+\newblock \emph{arXiv preprint arXiv:2107.03374}.
+
+\bibitem[{Chen et~al.(2023)Chen, Lin, Sch{\"a}rli, and Zhou}]{chen2023program}
+Xinyun Chen, Maxwell Lin, Nathanael Sch{\"a}rli, and Denny Zhou. 2023.
+\newblock Teaching large language models to self-debug.
+\newblock \emph{arXiv preprint arXiv:2304.05128}.
+
+\bibitem[{{DeepSeek-AI}(2024)}]{deepseekai2024}
+{DeepSeek-AI}. 2024.
+\newblock Deepseek-coder-v2: Breaking the barrier of closed-source models in
+  code intelligence.
+\newblock \url{https://github.com/deepseek-ai/DeepSeek-Coder-V2}.
+
+\bibitem[{Hong et~al.(2023)Hong, Zheng, Chen, Cheng, Zhang, Wang, Yau, Lin,
+  Zhou, Ran et~al.}]{hong2023metagpt}
+Sirui Hong, Xiawu Zheng, Jonathan Chen, Yuheng Cheng, Ceyao Zhang, Zili Wang,
+  Steven Yau, Zijuan Lin, Liyang Zhou, Chenyu Ran, and 1 others. 2023.
+\newblock Metagpt: Meta programming for multi-agent collaborative framework.
+\newblock \emph{arXiv preprint arXiv:2308.00352}.
+
+\bibitem[{{LangChain AI}(2024)}]{langgraph2024}
+{LangChain AI}. 2024.
+\newblock Langgraph: Building stateful, multi-actor applications with llms.
+\newblock \url{https://langchain-ai.github.io/langgraph/}.
+
+\bibitem[{Li et~al.(2023)Li, Allal, Zi, Muennighoff, Kocetkov, Mou, Marone,
+  Akiki, Li, Chim et~al.}]{li2023starcoderbase}
+Raymond Li, Loubna~Ben Allal, Yangtian Zi, Niklas Muennighoff, Denis Kocetkov,
+  Chenghao Mou, Marc Marone, Christopher Akiki, Jia Li, Jenny Chim, and 1
+  others. 2023.
+\newblock Starcoder: May the source be with you!
+\newblock \emph{arXiv preprint arXiv:2305.06161}.
+
+\bibitem[{Qian et~al.(2023)Qian, Cong, Liu, Yang, Chen, Su, Dang, Li, Liu, Tang
+  et~al.}]{qian2023chatdev}
+Chen Qian, Xin Cong, Wei Liu, Cheng Yang, Weize Chen, Yusheng Su, Yufan Dang,
+  Jiahao Li, Juyuan Liu, Dahai Tang, and 1 others. 2023.
+\newblock Communicative agents for software development.
+\newblock \emph{arXiv preprint arXiv:2307.07924}.
+
+\bibitem[{{Qwen Team}(2024)}]{qwen2024}
+{Qwen Team}. 2024.
+\newblock Qwen2.5-coder technical report.
+\newblock \url{https://qwenlm.github.io/blog/qwen2.5-coder/}.
+
+\bibitem[{Roziere et~al.(2023)Roziere, Gehring, Gloeckle, Sootla, Gat, Tan,
+  Adi, Liu, Remez, Rapin et~al.}]{roziere2023code}
+Baptiste Roziere, Jonas Gehring, Fabian Gloeckle, Sten Sootla, Itai Gat,
+  Xiaoqing~Ellen Tan, Yossi Adi, Jingyu Liu, Tal Remez, J{\'e}r{\'e}my Rapin,
+  and 1 others. 2023.
+\newblock Code llama: Open foundation models for code.
+\newblock \emph{arXiv preprint arXiv:2308.12950}.
+
+\bibitem[{Wei et~al.(2022)Wei, Wang, Schuurmans, Bosma, Xia, Chi, Le, and
+  Zhou}]{wei2022chain}
+Jason Wei, Xuezhi Wang, Dale Schuurmans, Maarten Bosma, Fei Xia, Ed~Chi, Quoc~V
+  Le, and Denny Zhou. 2022.
+\newblock Chain-of-thought prompting elicits reasoning in large language
+  models.
+\newblock \emph{Advances in Neural Information Processing Systems},
+  35:24824--24837.
+
+\end{thebibliography}
