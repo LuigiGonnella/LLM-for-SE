@@ -14,6 +14,25 @@
 % Additional packages
 \usepackage{graphicx}
 \usepackage{booktabs}
+
+% Packages for methodology section (TikZ diagrams, algorithms, code listings)
+\usepackage{tikz}
+\usetikzlibrary{positioning, arrows.meta, shapes.geometric}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{listings}
+\usepackage{xcolor}
+\lstset{
+    basicstyle=\small\ttfamily,
+    keywordstyle=\color{blue},
+    commentstyle=\color{gray},
+    stringstyle=\color{red},
+    showstringspaces=false,
+    breaklines=true,
+    frame=single,
+    numbers=left,
+    numberstyle=\tiny\color{gray}
+}
 \IfFileExists{multirow.sty}{\usepackage{multirow}}{}
 \usepackage{array}
 \usepackage{url}
@@ -65,43 +84,48 @@ We address the following research questions from the assignment requirements:
 
 \textbf{Self-Refinement.} Chain-of-thought reasoning~\citep{wei2022chain} and self-debugging~\citep{chen2023program} show that iterative refinement can improve LLM outputs. Our work systematically compares architectures with and without refinement mechanisms.
 
-\section{System Overview}
+% methodology section (imported from external file)
+\input{../methodology}
 
-We implement three architectures with increasing sophistication: Naive (baseline), Single-Agent (self-refinement), and Multi-Agent (role specialization with coordination). All systems use LangGraph~\citep{langgraph2024} for state management and conditional execution.
-
-\subsection{Naive Baseline}
-
-The Naive approach makes a single LLM call with the task specification (function signature and docstring). It generates code directly without intermediate reasoning, planning, or refinement. This serves as a minimal baseline to measure the value added by architectural complexity.
-
-\subsection{Single-Agent Architecture}
-
-The Single-Agent system implements a 5-stage pipeline:
-
-\begin{enumerate}
-    \item \textbf{Analysis:} Extract requirements, constraints, and edge cases from the task specification.
-    \item \textbf{Planning:} Design a solution strategy with algorithmic approach and data structures.
-    \item \textbf{Generation:} Produce code implementing the planned solution.
-    \item \textbf{Review:} Execute code, compute quality metrics (Maintainability Index, Cyclomatic Complexity), and perform self-critique.
-    \item \textbf{Refinement:} Iteratively improve code based on review feedback (up to 3 iterations).
-\end{enumerate}
-
-The agent uses execution results and quality metrics to guide refinement, terminating when tests pass or maximum iterations are reached.
-
-\subsection{Multi-Agent Architecture}
-
-The Multi-Agent system employs three specialized agents with distinct responsibilities:
-
-\textbf{Planner Agent (5 phases):} Creates comprehensive implementation plans through: (1) Intent Analysis---extract core problem and success metrics; (2) Requirements Engineering---define functional/non-functional requirements and edge cases; (3) Architecture Design---design components, patterns, and data structures; (4) Implementation Planning---create step-by-step coding instructions; (5) Quality Review---validate plan completeness (internal refinement loop, max 2 retries).
-
-\textbf{Coder Agent (6 phases):} Generates code from plans through: (1) Input Validation; (2) Edge Case Analysis; (3) Chain-of-Thought Generation---structured reasoning before coding; (4) Code Generation; (5) Code Validation---syntax and logic checks; (6) Code Optimization---improve readability and efficiency.
-
-\textbf{Critic Agent (4 phases):} Provides independent review through: (1) Input Validation; (2) Correctness Analysis---verify logic and test results; (3) Quality Review---assess maintainability and complexity; (4) Feedback Synthesis---generate actionable improvement suggestions.
-
-The system allows up to 2 iterations between Coder and Critic, terminating when all tests pass or maximum iterations are reached. We use Qwen2.5-Coder-7B for Planner and Coder, and DeepSeek-Coder-v2-16B for Critic to provide independent validation from a distinct model perspective.
-
-\subsection{Shared Components}
-
-All architectures share: (1) LLM interface (temperature: 0.7, max tokens: 2048); (2) Code execution sandbox with 10-second timeouts; (3) Quality metrics computation (MI, CC) using Radon~\citep{radon2024}; (4) Test harness for functional correctness evaluation.
+% --- Original System Overview ---
+%\section{System Overview}
+%
+%We implement three architectures with increasing sophistication: Naive (baseline), Single-Agent (self-refinement), and Multi-Agent (role specialization with coordination). All systems use LangGraph~\citep{langgraph2024} for state management and conditional execution.
+%
+%\subsection{Naive Baseline}
+%
+%The Naive approach makes a single LLM call with the task specification (function signature and docstring). It generates code directly without intermediate reasoning, planning, or refinement. This serves as a minimal baseline to measure the value added by architectural complexity.
+%
+%\subsection{Single-Agent Architecture}
+%
+%The Single-Agent system implements a 5-stage pipeline:
+%
+%\begin{enumerate}
+%    \item \textbf{Analysis:} Extract requirements, constraints, and edge cases from the task specification.
+%    \item \textbf{Planning:} Design a solution strategy with algorithmic approach and data structures.
+%    \item \textbf{Generation:} Produce code implementing the planned solution.
+%    \item \textbf{Review:} Execute code, compute quality metrics (Maintainability Index, Cyclomatic Complexity), and perform self-critique.
+%    \item \textbf{Refinement:} Iteratively improve code based on review feedback (up to 3 iterations).
+%\end{enumerate}
+%
+%The agent uses execution results and quality metrics to guide refinement, terminating when tests pass or maximum iterations are reached.
+%
+%\subsection{Multi-Agent Architecture}
+%
+%The Multi-Agent system employs three specialized agents with distinct responsibilities:
+%
+%\textbf{Planner Agent (5 phases):} Creates comprehensive implementation plans through: (1) Intent Analysis---extract core problem and success metrics; (2) Requirements Engineering---define functional/non-functional requirements and edge cases; (3) Architecture Design---design components, patterns, and data structures; (4) Implementation Planning---create step-by-step coding instructions; (5) Quality Review---validate plan completeness (internal refinement loop, max 2 retries).
+%
+%\textbf{Coder Agent (6 phases):} Generates code from plans through: (1) Input Validation; (2) Edge Case Analysis; (3) Chain-of-Thought Generation---structured reasoning before coding; (4) Code Generation; (5) Code Validation---syntax and logic checks; (6) Code Optimization---improve readability and efficiency.
+%
+%\textbf{Critic Agent (4 phases):} Provides independent review through: (1) Input Validation; (2) Correctness Analysis---verify logic and test results; (3) Quality Review---assess maintainability and complexity; (4) Feedback Synthesis---generate actionable improvement suggestions.
+%
+%The system allows up to 2 iterations between Coder and Critic, terminating when all tests pass or maximum iterations are reached. We use Qwen2.5-Coder-7B for Planner and Coder, and DeepSeek-Coder-v2-16B for Critic to provide independent validation from a distinct model perspective.
+%
+%\subsection{Shared Components}
+%
+%All architectures share: (1) LLM interface (temperature: 0.7, max tokens: 2048); (2) Code execution sandbox with 10-second timeouts; (3) Quality metrics computation (MI, CC) using Radon~\citep{radon2024}; (4) Test harness for functional correctness evaluation.
+% --- End of commented out section ---
 
 \section{Experimental Results}
 
