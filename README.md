@@ -49,10 +49,11 @@ A collaborative architecture with specialized agents, each having a distinct rol
 
 ```mermaid
 flowchart LR
+    Start([Task Description]) --> Planner
     Planner[Planner Agent] -->|Implementation Plan| Coder[Coder Agent]
     Coder -->|Code| Critic[Critic Agent]
     Critic -->|Feedback| Coder
-    Critic -->|Approved| End([End])
+    Critic -->|Approved| End([Final Code])
 ```
 
 ## Project Structure
