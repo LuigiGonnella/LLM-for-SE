@@ -23,6 +23,18 @@ experiments/
 # Models (do NOT commit large files)
 models/
 
-#WebApp
+# WebApp
 node_modules/
 single_agent_webapp/
+
+# LaTeX auxiliary files
+*.aux
+*.bbl
+*.blg
+*.fdb_latexmk
+*.fls
+*.synctex.gz
+*.out
+*.toc
+*.lof
+*.lot
