@@ -14,7 +14,6 @@ from src.tools.executor import execute_code
 from src.utils.code_parser import extract_python_code
 from src.evaluation.quality_metrics import compute_quality_metrics
 
-
 NAIVE_SYSTEM_PROMPT = """
 You are a Python code generation assistant.
 
@@ -34,47 +33,47 @@ def generate_code_naive(
 ) -> str:
     """
     Naive one-shot code generation.
-    
+
     Makes a single LLM call with the task specification and returns generated code.
     No analysis, planning, or review stages.
-    
+
     Args:
         signature: Function signature (e.g., "def count_vowels(s: str) -> int:")
         docstring: Function specification
         examples: Optional input/output examples
         model: LLM model to use
-    
+
     Returns:
         Generated Python code as string
     """
-    
+
     prompt = (
         "Generate a Python function that solves the following task.\n\n"
         f"Function signature:\n{signature}\n\n"
         f"Specification:\n{docstring}\n"
     )
-    
+
     if examples:
         prompt += f"\nExamples:\n{examples}\n"
-    
+
     prompt += (
         "\nGenerate the complete function implementation.\n"
         "Output ONLY the Python code, with no explanations or markdown.\n"
     )
-    
+
     raw_code = call_llm(
         system_prompt=NAIVE_SYSTEM_PROMPT,
         user_prompt=prompt,
         model=model,
     )
-    
+
     # Extract clean Python code
     extracted = extract_python_code(raw_code)
-    
+
     if extracted is None:
         # Fallback to raw output if extraction fails
         return raw_code
-    
+
     return extracted
 
 
@@ -83,14 +82,14 @@ def run_naive_baseline(
 ) -> dict:
     """
     Run the naive baseline end-to-end.
-    
+
     Returns:
         Dictionary with:
         - code: Generated code
         - exec_result: Execution results
         - quality_metrics: Code quality metrics
     """
-    
+
     # Generate code (single LLM call)
     code = generate_code_naive(
         signature=signature,
@@ -98,13 +97,13 @@ def run_naive_baseline(
         examples=examples,
         model=model,
     )
-    
+
     # Execute the code
     exec_result = execute_code(code)
-    
+
     # Compute quality metrics
     quality_metrics = compute_quality_metrics(code)
-    
+
     return {
         "code": code,
         "exec_result": exec_result,

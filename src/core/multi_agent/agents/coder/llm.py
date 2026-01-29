@@ -1,6 +1,5 @@
 from src.core.llm import call_llm
 
-
 BASE_SYSTEM_PROMPT = """You are an elite Python code generation agent for production-grade implementation.
 
 CORE PRINCIPLES:
@@ -328,10 +327,7 @@ CRITICAL RULES (NON-NEGOTIABLE):
 - Handle all edge cases mentioned in the plan
 """
 
-CODE_GENERATOR_PROMPT = (
-    BASE_SYSTEM_PROMPT
-    + CODE_GENERATOR_SPECIFIC
-    + """
+CODE_GENERATOR_PROMPT = BASE_SYSTEM_PROMPT + CODE_GENERATOR_SPECIFIC + """
 
 ═══════════════════════════════════════════════════════════════════════
 FEW-SHOT EXAMPLES
@@ -410,7 +406,6 @@ def reverse_string(s: str) -> str:
 
 ═══════════════════════════════════════════════════════════════════════
 """
-)
 
 
 def generate_code(

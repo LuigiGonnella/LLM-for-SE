@@ -14,7 +14,10 @@ from src.core.naive_baseline.naive_agent import generate_code_naive
 from src.utils.task_loader import load_tasks
 from src.utils.config import config
 from src.tools.executor import execute_code
-from src.evaluation.quality_metrics import compute_quality_metrics, format_metrics_report
+from src.evaluation.quality_metrics import (
+    compute_quality_metrics,
+    format_metrics_report,
+)
 from src.utils.test_runner import run_external_tests
 
 
@@ -101,6 +104,7 @@ def main():
         except Exception as e:
             print(f"\n❌ Pipeline failed with error: {e}")
             import traceback
+
             traceback.print_exc()
             continue
 
