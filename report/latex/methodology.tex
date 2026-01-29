@@ -15,8 +15,9 @@ We implement and evaluate three architectures of increasing complexity for LLM-b
 & \textbf{Naive} & \textbf{Single} & \textbf{Multi} \\
 \midrule
 LLM Calls & 1 & 5--8 & 10--20+ \\
-Reasoning Phases & 0 & 5 & 15 total \\
+Reasoning Phases & 0 & 5 & 5+6+4 \\
 Feedback Loop & No & Yes & Yes \\
+Max Iterations & 0 & 3 & 3 (default) \\
 Agent Identities & 1 & 1 & 3 \\
 \bottomrule
 \end{tabular}
@@ -76,7 +77,7 @@ The single-agent approach introduces structured multi-phase reasoning using Lang
     \draw[arrow] (plan) -- (gen);
     \draw[arrow] (gen) -- (review);
     \draw[arrow] (review) -- (refine);
-    \draw[arrow, dashed] (refine.west) -- ++(-0.4,0) |- (gen.south);
+    \draw[arrow, dashed] (refine.west) -- ++(-0.4,0) |- (review.south);
 \end{tikzpicture}%
 }
 \caption{Single-agent pipeline with refinement loop (max 3 iterations)}
@@ -175,7 +176,7 @@ The Critic provides rigorous review through four internal phases:
 
 \subsubsection{Orchestration}
 
-The master workflow coordinates the agents: (1) Planner creates the implementation plan; (2) Coder generates code; (3) code is executed and metrics computed; (4) Critic reviews and provides feedback; (5) if issues found, Coder refines with feedback. The loop continues until correct or maximum iterations reached.
+The master workflow coordinates the agents: (1) Planner creates the implementation plan; (2) Coder generates code; (3) code is executed and metrics computed; (4) Critic reviews and provides feedback; (5) if the Critic identifies issues, Coder regenerates with feedback. The loop continues until the Critic approves the code or maximum iterations (default: 3) are reached.
 
 %==============================================================================
 \subsection{Shared Infrastructure}
