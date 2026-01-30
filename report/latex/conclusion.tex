@@ -1,11 +1,14 @@
 \section{Conclusion}
+We presented a systematic comparison of three architectural approaches for LLM-based code generation, across 25 programming tasks.
 
-We systematically compared three architectural approaches for LLM-based code generation across 25 programming tasks. Our key findings:
+The Naive and Multi-Agent architectures achieved identical overall functional correctness (77.6\%), yet their performance profiles differ substantially.
+The Multi-Agent system justifies its computational costs in reasoning-intensive domains (Logic +10.8pp, DSA +9.4pp) where systematic planning yields a clear advantage.
+In contrast, for simple pattern-matching, agentic coordination introduces unnecessary overhead that degrades performance compared to the Naive baseline. \\
+Although Naive unexpectedly outperforms on Hard tasks, likely avoiding the over-refinement pitfalls of complex pipelines, our code quality analysis reveals that the Multi-Agent
+approach produces more modular solutions, preserving maintainability despite increased solution complexity.
 
-\textbf{Main Results.} Multi-Agent and Naive achieve identical overall correctness (77.6\%), outperforming Single-Agent (74.6\%). However, performance is highly task-dependent: Multi-Agent excels in algorithmic domains (Logic $+10.8$pp, DSA $+9.4$pp vs Single) but struggles on Lists ($-11.4$pp) and Easy tasks ($-15.3$pp).
+These findings suggest adaptive architecture selection: Naive for rapid prototyping, string manipulation, and known hard problems; Single-Agent for general-purpose development with
+systematic edge case checking; Multi-Agent for algorithmic reasoning, constraint satisfaction, and production-quality requirements in complex domains. \\
 
-\textbf{Architectural Trade-offs.} Sophisticated architectures justify their 20$\times$ computational overhead only for specific task types---medium-difficulty algorithmic problems. For pattern-matching (Strings) or trivial tasks (Easy), simpler approaches suffice. Surprisingly, Naive outperforms both architectures on Hard tasks (65.0\%), suggesting over-refinement can introduce bugs.
-
-\textbf{Practical Implications.} Our findings suggest adaptive architecture selection: (1) Naive for rapid prototyping, string manipulation, and known hard problems; (2) Single-Agent for general-purpose development with systematic edge case checking; (3) Multi-Agent for algorithmic reasoning, constraint satisfaction, and production-quality requirements in complex domains.
-
-\textbf{Limitations.} Our study is limited to 25 tasks and three model families. Future work should evaluate on larger benchmarks (APPS, CodeContests), investigate optimal refinement iteration counts, explore heterogeneous multi-agent configurations, and develop adaptive routing mechanisms to select architectures based on task characteristics.
+\textbf{Limitations}: Our study is limited to 25 tasks and three model families. Future work should evaluate on larger benchmarks (APPS, CodeContests), investigate optimal refinement iteration counts,
+explore heterogeneous multi-agent configurations, and develop adaptive routing mechanisms to select architectures based on task characteristics.
