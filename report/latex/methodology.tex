@@ -157,7 +157,7 @@ The Planner maintains an explicit state object containing each phase output (int
 \subsubsection{Coder Agent}
 
 
-The Coder agent, implemented in \texttt{coder/} and its \texttt{nodes/} submodule, transforms plans into executable code through six internal phases. The agent maintains a structured state object, tracking intermediate outputs and errors, and supports iterative refinement based on critic feedback. The modular design allows for targeted ablation (e.g. chain-of-thought), and facilitates the integration of advanced reasoning strategies or alternative code generation backends. The pipeline enforces strict signature and plan adherence, and includes robust error handling to ensure resilience against LLM or planning failures.
+The Coder agent, structured in \texttt{coder/} and its \texttt{nodes/} submodule, implements a six-phase, stateful pipeline that converts plans into executable code with strict plan and signature adherence, supports iterative refinement via critic feedback, enables modular ablations and advanced reasoning backends, and incorporates robust error handling for resilience against planning or LLM failures.
 
 \begin{enumerate}
     \item \textbf{Input Validation}: Validates function signature syntax (regex-based checks for \texttt{def}, parentheses, colon) and plan structure completeness, terminating early if critical requirements are missing.
