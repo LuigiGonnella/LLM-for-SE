@@ -1,10 +1,15 @@
-\begin{thebibliography}{13}
+\begin{thebibliography}{16}
 \providecommand{\natexlab}[1]{#1}
 
 \bibitem[{Austin et~al.(2021)Austin, Odena, Nye, Bosma, Michalewski, Dohan, Jiang, Cai, Terry, Le et~al.}]{austin2021program}
 Jacob Austin, Augustus Odena, Maxwell Nye, Maarten Bosma, Henryk Michalewski, David Dohan, Ellen Jiang, Carrie Cai, Michael Terry, Quoc Le, and 1 others. 2021.
 \newblock Program synthesis with large language models.
 \newblock \emph{arXiv preprint arXiv:2108.07732}.
+
+\bibitem[{Bommasani et~al.(2021)Bommasani, Hudson, Adeli, Altman, Arora, von Arx, Bernstein, Bohg, Bosselut, Brunskill et~al.}]{bommasani2021opportunities}
+Rishi Bommasani, Drew~A. Hudson, Ehsan Adeli, Russ Altman, Simran Arora, Sydney von Arx, Michael~S. Bernstein, Jeannette Bohg, Antoine Bosselut, Emma Brunskill, and 1 others. 2021.
+\newblock On the opportunities and risks of foundation models.
+\newblock \emph{arXiv preprint arXiv:2108.07258}.
 
 \bibitem[{Campagna(2024)}]{radon2024}
 Michele Campagna. 2024.
@@ -30,6 +35,11 @@ Xinyun Chen, Maxwell Lin, Nathanael Sch{\"a}rli, and Denny Zhou. 2023.
 Sirui Hong, Xiawu Zheng, Jonathan Chen, Yuheng Cheng, Ceyao Zhang, Zili Wang, Steven Yau, Zijuan Lin, Liyang Zhou, Chenyu Ran, and 1 others. 2023.
 \newblock Metagpt: Meta programming for multi-agent collaborative framework.
 \newblock \emph{arXiv preprint arXiv:2308.00352}.
+
+\bibitem[{Huang et~al.(2023)Huang, Chen, Mishra, Zheng, Yu, Song, and Zhou}]{huang2023large}
+Jie Huang, Xinyun Chen, Swaroop Mishra, Huaixiu~Steven Zheng, Adams~Wei Yu, Xinying Song, and Denny Zhou. 2023.
+\newblock Large language models cannot self-correct reasoning yet.
+\newblock \emph{arXiv preprint arXiv:2310.01798}.
 
 \bibitem[{{LangChain AI}(2024)}]{langgraph2024}
 {LangChain AI}. 2024.
@@ -60,6 +70,11 @@ Chen Qian, Xin Cong, Wei Liu, Cheng Yang, Weize Chen, Yusheng Su, Yufan Dang, Ji
 Baptiste Roziere, Jonas Gehring, Fabian Gloeckle, Sten Sootla, Itai Gat, Xiaoqing~Ellen Tan, Yossi Adi, Jingyu Liu, Tal Remez, J{\'e}r{\'e}my Rapin, and 1 others. 2023.
 \newblock Code llama: Open foundation models for code.
 \newblock \emph{arXiv preprint arXiv:2308.12950}.
+
+\bibitem[{Strubell et~al.(2019)Strubell, Ganesh, and McCallum}]{strubell2019energy}
+Emma Strubell, Ananya Ganesh, and Andrew McCallum. 2019.
+\newblock Energy and policy considerations for deep learning in {NLP}.
+\newblock \emph{arXiv preprint arXiv:1906.02243}.
 
 \bibitem[{Wei et~al.(2022)Wei, Wang, Schuurmans, Bosma, Xia, Chi, Le, and Zhou}]{wei2022chain}
 Jason Wei, Xuezhi Wang, Dale Schuurmans, Maarten Bosma, Fei Xia, Ed~Chi, Quoc~V Le, and Denny Zhou. 2022.
