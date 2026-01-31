@@ -43,32 +43,18 @@
 \title{Architectures for Code Development with LLMs:\\ A Comparative Study of Multi-Agent Approaches}
 
 \author{
-  Riccardo Marconi \\
+  Riccardo Marconi, Dorotea Monaco, Luigi Gonnella, \\
+  \textbf{Name Surname, \and Name Surname} \\
   Politecnico di Torino \\
-  \small\texttt{riccardo.marconi@studenti.polito.it}
-  \And
-  Dorotea Monaco \\
-  Politecnico di Torino \\
-  \small\texttt{dorotea.monaco@studenti.polito.it}
-  \And
-  Luigi Gonnella \\
-  Politecnico di Torino \\
-  \small\texttt{luigi.gonnella@studenti.polito.it}
-  \AND
-  Name Surname \\
-  Politecnico di Torino \\
-  \small\texttt{email@studenti.polito.it}
-  \And
-  Name Surname \\
-  Politecnico di Torino \\
-  \small\texttt{email@studenti.polito.it}
+  \texttt{\{riccardo.marconi, dorotea.monaco, luigi.gonnella,} \\
+  \texttt{email4, email5\}@studenti.polito.it}
 }
 
 \begin{document}
 \maketitle
 
 \begin{abstract}
-  Large language models (LLMs) demonstrate impressive code generation capabilities, yet single-prompt interactions often fail on complex development tasks. We investigate whether multi-agent architectures improve code quality through role specialization and iterative refinement. We compare three approaches---Naive (one-shot generation), Single-Agent (5-stage pipeline with self-refinement), and Multi-Agent (Planner-Coder-Critic coordination)---across 25 programming tasks spanning five domains and three difficulty levels. Surprisingly, Multi-Agent and Naive achieve identical overall correctness (77.6\%), outperforming Single-Agent (74.6\%). However, Multi-Agent excels in algorithmically demanding domains (DSA: 85.9\%, Logic: 75.7\%) and medium-difficulty tasks (91.8\%), justifying its 20$\times$ computational overhead only for specific task types. Our findings reveal that architectural sophistication benefits complex algorithmic reasoning but can hurt performance on simple tasks through over-refinement.
+  Large language models (LLMs) demonstrate impressive code generation capabilities, yet single-prompt interactions often fail on complex development tasks. We investigate whether multi-agent architectures improve code quality through role specialization and iterative refinement. We compare three approaches---Naive (one-shot generation), Single-Agent (5-stage pipeline with self-refinement), and Multi-Agent (Planner-Coder-Critic coordination)---across 25 programming tasks spanning five domains and three difficulty levels. Surprisingly, Multi-Agent and Naive achieve identical overall correctness (77.6\%), outperforming Single-Agent (74.6\%). However, Multi-Agent excels in algorithmically demanding domains (DSA: 85.9\%, Logic: 75.7\%) and medium-difficulty tasks (91.8\%), justifying its computational overhead only for specific task types. Our findings reveal that architectural sophistication benefits complex algorithmic reasoning but can hurt performance on simple tasks through over-refinement.
 \end{abstract}
 
 \section{Introduction}
