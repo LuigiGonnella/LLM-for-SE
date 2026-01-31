@@ -157,29 +157,27 @@ The Planner maintains an explicit state object containing each phase output (int
 \subsubsection{Coder Agent}
 
 
-
 The Coder agent, implemented in \texttt{coder/} and its \texttt{nodes/} submodule, transforms plans into executable code through six internal phases. The agent maintains a structured state object, tracking intermediate outputs and errors, and supports iterative refinement based on critic feedback. The modular design allows for targeted ablation (e.g. chain-of-thought), and facilitates the integration of advanced reasoning strategies or alternative code generation backends. The pipeline enforces strict signature and plan adherence, and includes robust error handling to ensure resilience against LLM or planning failures.
 
 \begin{enumerate}
-    \item \textbf{Input Validation}: Verifies signature syntax and plan completeness.
-    \item \textbf{Edge Case Analysis}: Identifies type-specific boundaries (numeric, collection, string).
-    \item \textbf{Chain-of-Thought}: Generates structured reasoning before implementation.
-    \item \textbf{Code Generation}: Produces code with full accumulated context.
-    \item \textbf{Code Validation}: Checks syntax via AST parsing and detects logic issues.
-    \item \textbf{Code Optimization}: Improves naming, efficiency, and style.
+    \item \textbf{Input Validation}: Validates function signature syntax (regex-based checks for \texttt{def}, parentheses, colon) and plan structure completeness, terminating early if critical requirements are missing.
+    \item \textbf{Edge Case Analysis}: Extracts type hints from the signature via regex parsing and identifies type-specific boundary conditions (empty collections, zero/negative numerics, null strings) informed by the implementation plan.
+    \item \textbf{Chain-of-Thought Generation}: Produces step-by-step reasoning that decomposes the problem into atomic steps, references identified edge cases, and plans algorithmic approach, incorporating feedback from previous iterations if refinement is active.
+    \item \textbf{Code Generation}: Synthesizes Python code by accumulating context from all prior phases (signature, plan, edge cases, CoT reasoning) plus any critic feedback and execution summaries from previous iterations.
+    \item \textbf{Code Validation}: Performs syntax validation via AST parsing and basic logic checks (infinite loop heuristics, unreachable code detection); accepts code with warnings but rejects on syntax errors.
+    \item \textbf{Code Optimization}: Applies LLM-based refinement to improve variable naming, algorithmic efficiency, and adherence to PEP 8 style conventions; falls back to validated code if optimization fails.
 \end{enumerate}
 
 \subsubsection{Critic Agent}
 
 
-
-The Critic agent, structured in \texttt{critic/} and its \texttt{nodes/} submodule, provides rigorous review through four internal phases. Each review phase is implemented as a node class, enabling fine-grained control over validation, analysis, and feedback generation. The critic maintains a detailed state object, recording all detected issues, review scores, and actionable feedback. This architecture supports extensible review criteria (e.g., adding new static analysis tools or custom constraints), and enables systematic studies of review depth and prioritization strategies. The critic's feedback is explicitly structured to guide the coder's refinement process, ensuring a clear separation between correctness and quality concerns.
+The Critic agent, organized in \texttt{critic/} and its \texttt{nodes/} submodule, performs a four-phase, node-based review process with a shared state that tracks issues, scores, and structured feedback, enabling extensible validation criteria and clearly separating correctness from quality to guide systematic code refinement.
 
 \begin{enumerate}
-    \item \textbf{Input Validation}: Ensures code, plan, and signature are present.
-    \item \textbf{Correctness Analysis}: Verifies logic, interprets execution errors, checks constraints.
-    \item \textbf{Quality Review}: Assesses complexity, maintainability, and style.
-    \item \textbf{Feedback Synthesis}: Produces actionable instructions, prioritizing correctness over quality.
+    \item \textbf{Input Validation}: Verifies presence of required artifacts (code, plan, signature) and halts if prerequisites are missing.
+    \item \textbf{Correctness Analysis}: Evaluates functional correctness by cross-referencing code logic against plan requirements, interpreting execution error traces when available, and validating constraint satisfaction (time/space complexity, edge case handling).
+    \item \textbf{Quality Review}: Assesses maintainability via static metrics (cyclomatic complexity, maintainability index from Radon), code structure clarity, and adherence to coding standards.
+    \item \textbf{Feedback Synthesis}: Consolidates correctness and quality analyses into prioritized, actionable feedback for the Coder, explicitly prioritizing correctness issues over stylistic concerns to guide refinement effectively.
 \end{enumerate}
 
 \subsubsection{Orchestration}
